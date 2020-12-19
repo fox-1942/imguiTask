@@ -1,3 +1,0 @@
-C:/Users/Foxx/CLionProjects/untitled1/bin/CMakeFiles/imguiTask.dir
-C:/Users/Foxx/CLionProjects/untitled1/bin/CMakeFiles/ALL_BUILD.dir
-C:/Users/Foxx/CLionProjects/untitled1/bin/CMakeFiles/ZERO_CHECK.dir
