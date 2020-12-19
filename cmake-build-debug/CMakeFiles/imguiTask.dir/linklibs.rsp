@@ -1,0 +1,1 @@
+  -LC:/Users/Foxx/CLionProjects/untitled1/libs/GLFW  -LC:/Users/Foxx/CLionProjects/untitled1/libs/GLEW  -lopengl32 -lglfw3 -lkernel32 -luser32 -lgdi32 -lwinspool -lshell32 -lole32 -loleaut32 -luuid -lcomdlg32 -ladvapi32 

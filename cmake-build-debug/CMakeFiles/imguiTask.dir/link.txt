@@ -1,0 +1,3 @@
+"C:\Program Files\JetBrains\CLion 2018.3\bin\cmake\win\bin\cmake.exe" -E rm -f CMakeFiles\imguiTask.dir/objects.a
+D:\mingw64\bin\ar.exe cr CMakeFiles\imguiTask.dir/objects.a @CMakeFiles\imguiTask.dir\objects1.rsp
+D:\mingw64\bin\g++.exe -g   -Wl,--whole-archive CMakeFiles\imguiTask.dir/objects.a -Wl,--no-whole-archive  -o imguiTask.exe -Wl,--out-implib,libimguiTask.dll.a -Wl,--major-image-version,0,--minor-image-version,0 @CMakeFiles\imguiTask.dir\linklibs.rsp
