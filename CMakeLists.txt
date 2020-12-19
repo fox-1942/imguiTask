@@ -14,12 +14,14 @@ add_executable(${PROJECT_NAME}
         src/imgui_impl_opengl3.cpp
         )
 
-target_include_directories(${PROJECT_NAME} PUBLIC includes
+target_include_directories(${PROJECT_NAME} PUBLIC
+        includes
         includes/GLFW
         includes/ImGUI
         includes/GL
-        includes/KHR)
+        includes/KHR
+        )
 
-target_link_directories(${PROJECT_NAME} PUBLIC libs/GLFW libs/GLEW)
+target_link_directories(${PROJECT_NAME} PUBLIC libs/GLFW)
 
 target_link_libraries(${PROJECT_NAME} opengl32 glfw3)
