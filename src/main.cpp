@@ -69,6 +69,7 @@ int main() {
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
     glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 
+
     // Window creation
     GLFWwindow *window = glfwCreateWindow(1280, 720, "ImGui Task for Grand Color Central", NULL, NULL);
     if (window == NULL)
@@ -86,10 +87,15 @@ int main() {
     ImGuiIO &io = ImGui::GetIO();
     (void) io;
 
+
     ImGui::StyleColorsLight();
     ImGui_ImplGlfw_InitForOpenGL(window, true);
     ImGui_ImplOpenGL3_Init("#version 460");
     ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
+
+
+
+
 
     // Loading image
     int imageWidth(0);
@@ -102,6 +108,7 @@ int main() {
 
     ImVec2 mouse_pos_in_canvas(0, 0);
     ImVec4 color = ImVec4(114.0f / 255.0f, 144.0f / 255.0f, 154.0f / 255.0f, 200.0f / 255.0f);
+    bool clicked = false;
 
     while (!glfwWindowShouldClose(window)) {
         glfwPollEvents();
@@ -109,29 +116,32 @@ int main() {
         ImGui_ImplOpenGL3_NewFrame();
         ImGui_ImplGlfw_NewFrame();
         ImGui::NewFrame();
+        ImGui::Begin("Color Picker for images");
 
-        ImGui::Begin("OpenGL Texture Text");
+      ImVec2 canvas_p0 = ImGui::GetCursorScreenPos();
 
-        ImVec2 canvas_p0(ImGui::GetCursorScreenPos().x, ImGui::GetCursorScreenPos().y);
-
-        ImGuiIO &io = ImGui::GetIO();
-        ImDrawList *draw_list = ImGui::GetWindowDrawList();
         ImGui::Image((void *) (intptr_t) image, ImVec2(imageWidth, imageHeight));
 
         // Creating invisible canvas before the loaded image
         ImVec2 canvas_p1 = ImVec2(canvas_p0.x + imageWidth, canvas_p0.y + imageHeight);
-        draw_list->AddRectFilled(canvas_p0, canvas_p1, IM_COL32(50, 50, 50, 0));
-        
-        const bool is_hovered = ImGui::IsItemHovered();
 
+        ImGuiIO &io = ImGui::GetIO();
+        ImDrawList *draw_list = ImGui::GetWindowDrawList();
+        draw_list->AddRectFilled(canvas_p0, canvas_p1, IM_COL32(50, 50, 50, 100));
+
+        bool is_hovered = ImGui::IsItemHovered();
+
+        draw_list->PushClipRect(canvas_p0, canvas_p1, true);
         if (is_hovered && ImGui::IsMouseClicked(ImGuiMouseButton_Left)) {
             mouse_pos_in_canvas = ImVec2(io.MousePos.x - canvas_p0.x, io.MousePos.y - canvas_p0.y);
             color = readPixelFromImage(mouse_pos_in_canvas);
-            //   draw_list->AddLine(ImVec2(canvas_p0.x + 10, canvas_p0.y), ImVec2(canvas_p0.x + 10, canvas_p0.y),
-            //                    IM_COL32(200, 200, 200, 40));
+            clicked = true;
         }
 
-        // Draw border and background color
+        if (clicked) {
+            draw_list->AddCircle(ImVec2(canvas_p0.x+mouse_pos_in_canvas.x,canvas_p0.y+mouse_pos_in_canvas.y), 10.0, IM_COL32(50, 100, 100, 100), 0, 10);
+        }
+        draw_list->PopClipRect();
 
         static bool no_border = false;
         ImGui::Checkbox("ImGuiColorEditFlags_NoBorder", &no_border);
