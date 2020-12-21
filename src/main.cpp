@@ -48,11 +48,6 @@ ImVec4 readPixelFromImage(ImVec2 mousePosition) {
     unsigned char *image_data = stbi_load("../lena.jpg", &imageWidth, &imageHeight, NULL, 4);
     unsigned char *pixels = image_data + (int(mousePosition.y) * imageWidth * 4) + (int(mousePosition.x) * 4);
 
-    std::cout << "r: " << static_cast<int>(pixels[0]) << '\n';
-    std::cout << "g: " << static_cast<int>(pixels[1]) << '\n';
-    std::cout << "b: " << static_cast<int>(pixels[2]) << '\n';
-    std::cout << "a: " << static_cast<int>(pixels[3]) << '\n' << std::endl;
-
     return ImVec4(static_cast<int>(pixels[0]) / 255.0f, static_cast<int>(pixels[1]) / 255.0f,
                   static_cast<int>(pixels[2]) / 255.0f,
                   static_cast<int>(pixels[3]) / 255.0f);
@@ -71,7 +66,7 @@ int main() {
 
 
     // Window creation
-    GLFWwindow *window = glfwCreateWindow(1280, 720, "ImGui Task for Grand Color Central", NULL, NULL);
+    GLFWwindow *window = glfwCreateWindow(1280, 1000, "ImGui Task for Grand Color Central", NULL, NULL);
     if (window == NULL)
         return 1;
     glfwMakeContextCurrent(window);
@@ -91,9 +86,9 @@ int main() {
     ImGui::StyleColorsLight();
     ImGui_ImplGlfw_InitForOpenGL(window, true);
     ImGui_ImplOpenGL3_Init("#version 460");
-    ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
+    ImVec4 clear_color = ImVec4(30.0f/255.0f, 144.0f/255.0f, 200.0f/255.0f, 1.00f);
 
-    
+
     // Loading image
     int imageWidth(0);
     int imageHeight(0);
@@ -104,7 +99,7 @@ int main() {
     // Declaring dimensions and some vectors
 
     ImVec2 mouse_pos_in_canvas(0, 0);
-    ImVec4 color = ImVec4(114.0f / 255.0f, 144.0f / 255.0f, 154.0f / 255.0f, 200.0f / 255.0f);
+    ImVec4 color = ImVec4(255.0f,  255.0f,  255.0f,  255.0f);
     bool clicked = false;
 
     while (!glfwWindowShouldClose(window)) {
@@ -113,6 +108,7 @@ int main() {
         ImGui_ImplOpenGL3_NewFrame();
         ImGui_ImplGlfw_NewFrame();
         ImGui::NewFrame();
+        ImGui::SetNextWindowSize(ImVec2(530,900),ImGuiCond_Always);
         ImGui::Begin("Color Picker for images");
 
         ImVec2 canvas_p0 = ImGui::GetCursorScreenPos();
@@ -136,9 +132,6 @@ int main() {
         }
 
         if (clicked) {
-           // draw_list->AddCircle(ImVec2(canvas_p0.x + mouse_pos_in_canvas.x, canvas_p0.y + mouse_pos_in_canvas.y), 10.0,
-                  //               IM_COL32(50, 100, 100, 100), 0, 10);
-
             float diff=30;
 
             ImVec2 startingPoint_H=ImVec2(canvas_p0.x + mouse_pos_in_canvas.x-diff,canvas_p0.y + mouse_pos_in_canvas.y );
@@ -151,9 +144,10 @@ int main() {
 
         }
         draw_list->PopClipRect();
-
+        ImGui::Dummy(ImVec2(0.0f, 20.0f));
         ImGui::Text("Sampled Color:");
-        ImGui::ColorButton("ColorField", color,0 , ImVec2(80, 80));
+
+        ImGui::ColorButton("Selected color", color,0 , ImVec2(80, 80));
 
         ImGui::Text("Mouse pos in canvas: (%g, %g)", mouse_pos_in_canvas.x, mouse_pos_in_canvas.y);
         ImGui::Text("Mouse pos in screen: (%g, %g)", io.MousePos.x, io.MousePos.y);
