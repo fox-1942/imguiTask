@@ -118,7 +118,7 @@ int main() {
         ImGui::NewFrame();
         ImGui::Begin("Color Picker for images");
 
-      ImVec2 canvas_p0 = ImGui::GetCursorScreenPos();
+        ImVec2 canvas_p0 = ImGui::GetCursorScreenPos();
 
         ImGui::Image((void *) (intptr_t) image, ImVec2(imageWidth, imageHeight));
 
@@ -127,7 +127,7 @@ int main() {
 
         ImGuiIO &io = ImGui::GetIO();
         ImDrawList *draw_list = ImGui::GetWindowDrawList();
-        draw_list->AddRectFilled(canvas_p0, canvas_p1, IM_COL32(50, 50, 50, 100));
+        draw_list->AddRectFilled(canvas_p0, canvas_p1, IM_COL32(50, 50, 50, 0));
 
         bool is_hovered = ImGui::IsItemHovered();
 
@@ -139,14 +139,24 @@ int main() {
         }
 
         if (clicked) {
-            draw_list->AddCircle(ImVec2(canvas_p0.x+mouse_pos_in_canvas.x,canvas_p0.y+mouse_pos_in_canvas.y), 10.0, IM_COL32(50, 100, 100, 100), 0, 10);
+           // draw_list->AddCircle(ImVec2(canvas_p0.x + mouse_pos_in_canvas.x, canvas_p0.y + mouse_pos_in_canvas.y), 10.0,
+                  //               IM_COL32(50, 100, 100, 100), 0, 10);
+
+            float diff=30;
+
+            ImVec2 startingPoint_H=ImVec2(canvas_p0.x + mouse_pos_in_canvas.x-diff,canvas_p0.y + mouse_pos_in_canvas.y );
+            ImVec2 endingPoint_H=ImVec2(canvas_p0.x + mouse_pos_in_canvas.x+diff,canvas_p0.y + mouse_pos_in_canvas.y );
+            draw_list->AddLine(startingPoint_H,endingPoint_H,IM_COL32(100, 0, 0, 40),7);
+
+            ImVec2 startingPoint_V=ImVec2(canvas_p0.x + mouse_pos_in_canvas.x,canvas_p0.y + mouse_pos_in_canvas.y-diff );
+            ImVec2 endingPoint_V=ImVec2(canvas_p0.x + mouse_pos_in_canvas.x,canvas_p0.y + mouse_pos_in_canvas.y+diff );
+            draw_list->AddLine(startingPoint_V,endingPoint_V,IM_COL32(100, 0, 0, 40),7);
+
         }
         draw_list->PopClipRect();
 
-        static bool no_border = false;
-        ImGui::Checkbox("ImGuiColorEditFlags_NoBorder", &no_border);
         ImGui::Text("Sampled Color:");
-        ImGui::ColorButton("ColorField", color, (no_border ? ImGuiColorEditFlags_NoBorder : 0), ImVec2(80, 80));
+        ImGui::ColorButton("ColorField", color,0 , ImVec2(80, 80));
 
         ImGui::Text("Mouse pos in canvas: (%g, %g)", mouse_pos_in_canvas.x, mouse_pos_in_canvas.y);
         ImGui::Text("Mouse pos in screen: (%g, %g)", io.MousePos.x, io.MousePos.y);
