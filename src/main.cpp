@@ -1,5 +1,6 @@
 #include <gl3w.h>
 #include <iostream>
+#include <glfw3.h>
 #include "imgui.h"
 #include "imgui_impl_glfw.h"
 #include "imgui_impl_opengl3.h"
@@ -41,20 +42,20 @@ bool LoadTextureFromFile(const char *filename, GLuint *out_texture, int *out_wid
     return true;
 }
 
-void readPixelFromImage(ImVec2 mousePosition) {
+ImVec4 readPixelFromImage(ImVec2 mousePosition) {
     int imageWidth(0);
     int imageHeight(0);
-
-    unsigned char*image_data = stbi_load("../foo.png", &imageWidth, &imageHeight, NULL, 4);
-
-    unsigned char* pixels = image_data +( int(mousePosition.y) * imageWidth * 4 )+ (int(mousePosition.x) * 4);
+    unsigned char *image_data = stbi_load("../foo.png", &imageWidth, &imageHeight, NULL, 4);
+    unsigned char *pixels = image_data + (int(mousePosition.y) * imageWidth * 4) + (int(mousePosition.x) * 4);
 
     std::cout << "r: " << static_cast<int>(pixels[0]) << '\n';
     std::cout << "g: " << static_cast<int>(pixels[1]) << '\n';
     std::cout << "b: " << static_cast<int>(pixels[2]) << '\n';
     std::cout << "a: " << static_cast<int>(pixels[3]) << '\n' << std::endl;
-}
 
+    return ImVec4(static_cast<int>(pixels[0])/255.0f, static_cast<int>(pixels[1])/255.0f, static_cast<int>(pixels[2])/255.0f,
+                  static_cast<int>(pixels[3])/255.0f);
+}
 
 int main() {
 
@@ -98,10 +99,9 @@ int main() {
 
     // Declaring dimensions and some vectors
 
-    ImVec2 canvas_sz = ImVec2(imageWidth, imageHeight);
     ImVec2 origin(0, 0);
     ImVec2 mouse_pos_in_canvas(0, 0);
-
+    ImVec4 color = ImVec4(114.0f / 255.0f, 144.0f / 255.0f, 154.0f / 255.0f, 200.0f / 255.0f);
 
     while (!glfwWindowShouldClose(window)) {
         glfwPollEvents();
@@ -120,37 +120,40 @@ int main() {
         ImGui::Image((void *) (intptr_t) image, ImVec2(imageWidth, imageHeight));
         const bool is_hovered = ImGui::IsItemHovered();
 
-        ImGui::Text("Sampled Color:");
-        static ImVec4 color = ImVec4(114.0f / 255.0f, 144.0f / 255.0f, 154.0f / 255.0f, 200.0f / 255.0f);
-        ImGui::ColorButton("MyColor##3c", color, 0, ImVec2(80, 80));
-
-
         origin = ImVec2(canvas_p0.x, canvas_p0.y);
 
-        // Add first and second point
+
+        static ImVec4 colf = ImVec4(0, 0, 0.4f, 0);
+        const ImU32 col = ImColor(colf);
+
+
         if (is_hovered && ImGui::IsMouseClicked(ImGuiMouseButton_Left)) {
             mouse_pos_in_canvas = ImVec2(io.MousePos.x - origin.x, io.MousePos.y - origin.y);
-           readPixelFromImage(mouse_pos_in_canvas);
+            color = readPixelFromImage(mouse_pos_in_canvas);
+
+            ImDrawList* draw_list = ImGui::GetWindowDrawList();
+            draw_list->AddLine(ImVec2(canvas_p0.x + 10, canvas_p0.y), ImVec2(canvas_p0.x + 10, canvas_p0.y),
+                               IM_COL32(200, 200, 200, 40));
         }
+        static bool no_border = false;
+        ImGui::Checkbox("ImGuiColorEditFlags_NoBorder", &no_border);
+        ImGui::Text("Sampled Color:");
+        ImGui::ColorButton("ColorField",  color,  (no_border ? ImGuiColorEditFlags_NoBorder : 0), ImVec2(80, 80));
 
         ImGui::Text("Mouse pos in canvas: (%g, %g)", mouse_pos_in_canvas.x, mouse_pos_in_canvas.y);
         ImGui::Text("Mouse pos in screen: (%g, %g)", io.MousePos.x, io.MousePos.y);
 
 
+
+
 //----------------------------------------------------------------------------------------
-
         ImGui::End();
-
-        // Rendering
         ImGui::Render();
-        int display_w(0);
-        int display_h(0);
-        glfwGetFramebufferSize(window, &display_w, &display_h);
-        glViewport(0, 0, display_w, display_h);
+
         glClearColor(clear_color.x, clear_color.y, clear_color.z, clear_color.w);
         glClear(GL_COLOR_BUFFER_BIT);
-        ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 
+        ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
         glfwSwapBuffers(window);
     }
 

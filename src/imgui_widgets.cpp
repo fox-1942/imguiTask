@@ -46,6 +46,8 @@ Index of this file:
 #include <stddef.h>     // intptr_t
 #else
 #include <stdint.h>     // intptr_t
+#include <iostream>
+
 #endif
 
 //-------------------------------------------------------------------------
@@ -5263,6 +5265,7 @@ bool ImGui::ColorButton(const char* desc_id, const ImVec4& col, ImGuiColorEditFl
         flags &= ~(ImGuiColorEditFlags_AlphaPreview | ImGuiColorEditFlags_AlphaPreviewHalf);
 
     ImVec4 col_rgb = col;
+
     if (flags & ImGuiColorEditFlags_InputHSV)
         ColorConvertHSVtoRGB(col_rgb.x, col_rgb.y, col_rgb.z, col_rgb.x, col_rgb.y, col_rgb.z);
 
