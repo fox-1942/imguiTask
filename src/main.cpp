@@ -45,7 +45,7 @@ bool LoadTextureFromFile(const char *filename, GLuint *out_texture, int *out_wid
 ImVec4 readPixelFromImage(ImVec2 mousePosition) {
     int imageWidth(0);
     int imageHeight(0);
-    unsigned char *image_data = stbi_load("../foo.png", &imageWidth, &imageHeight, NULL, 4);
+    unsigned char *image_data = stbi_load("../lena.jpg", &imageWidth, &imageHeight, NULL, 4);
     unsigned char *pixels = image_data + (int(mousePosition.y) * imageWidth * 4) + (int(mousePosition.x) * 4);
 
     std::cout << "r: " << static_cast<int>(pixels[0]) << '\n';
@@ -93,15 +93,12 @@ int main() {
     ImGui_ImplOpenGL3_Init("#version 460");
     ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
 
-
-
-
-
+    
     // Loading image
     int imageWidth(0);
     int imageHeight(0);
     GLuint image(0);
-    bool ret = LoadTextureFromFile("../foo.png", &image, &imageWidth, &imageHeight);
+    bool ret = LoadTextureFromFile("../lena.jpg", &image, &imageWidth, &imageHeight);
     IM_ASSERT(ret);
 
     // Declaring dimensions and some vectors
@@ -146,11 +143,11 @@ int main() {
 
             ImVec2 startingPoint_H=ImVec2(canvas_p0.x + mouse_pos_in_canvas.x-diff,canvas_p0.y + mouse_pos_in_canvas.y );
             ImVec2 endingPoint_H=ImVec2(canvas_p0.x + mouse_pos_in_canvas.x+diff,canvas_p0.y + mouse_pos_in_canvas.y );
-            draw_list->AddLine(startingPoint_H,endingPoint_H,IM_COL32(100, 0, 0, 40),7);
+            draw_list->AddLine(startingPoint_H,endingPoint_H,IM_COL32(0, 100, 0, 100),5);
 
             ImVec2 startingPoint_V=ImVec2(canvas_p0.x + mouse_pos_in_canvas.x,canvas_p0.y + mouse_pos_in_canvas.y-diff );
             ImVec2 endingPoint_V=ImVec2(canvas_p0.x + mouse_pos_in_canvas.x,canvas_p0.y + mouse_pos_in_canvas.y+diff );
-            draw_list->AddLine(startingPoint_V,endingPoint_V,IM_COL32(100, 0, 0, 40),7);
+            draw_list->AddLine(startingPoint_V,endingPoint_V,IM_COL32(0, 100, 0, 100),5);
 
         }
         draw_list->PopClipRect();
