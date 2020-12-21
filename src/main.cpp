@@ -14,18 +14,7 @@ static void glfw_error_callback(int error, const char *description) {
     fprintf(stderr, "Glfw Error %d: %s\n", error, description);
 }
 
-void readPixelFromImage(ImVec2 mousePosition) {
-
-    unsigned char pixels[4];
-    glReadPixels(GLint(mousePosition.x), GLint(mousePosition.y), 1, 1, GL_RGBA, GL_UNSIGNED_BYTE, pixels);
-
-    std::cout << "r: " << static_cast<int>(pixels[0]) << '\n';
-    std::cout << "g: " << static_cast<int>(pixels[1]) << '\n';
-    std::cout << "b: " << static_cast<int>(pixels[2]) << '\n';
-    std::cout << "a: " << static_cast<int>(pixels[3]) << '\n' << std::endl;
-}
-
-bool LoadTextureFromFile(const char *filename, GLuint *out_texture, int *out_width, int *out_height,ImVec2 mousePosition ) {
+bool LoadTextureFromFile(const char *filename, GLuint *out_texture, int *out_width, int *out_height) {
 
     // Reading the image into a GL_TEXTURE_2D
     int image_width = 0;
@@ -49,17 +38,21 @@ bool LoadTextureFromFile(const char *filename, GLuint *out_texture, int *out_wid
     *out_width = image_width;
     *out_height = image_height;
 
-    unsigned int fbo;
-    glGenFramebuffers(1, &fbo);
-    glBindFramebuffer(GL_FRAMEBUFFER, fbo);
-    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, image_texture, 0); glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, image_texture, 0);
-
-    if(glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE){
-        std::cout<< "Frame buffer is done."<< std::endl;
-    }
-
-
     return true;
+}
+
+void readPixelFromImage(ImVec2 mousePosition) {
+    int imageWidth(0);
+    int imageHeight(0);
+
+    unsigned char*image_data = stbi_load("../foo.png", &imageWidth, &imageHeight, NULL, 4);
+
+    unsigned char* pixels = image_data +( int(mousePosition.y) * imageWidth * 4 )+ (int(mousePosition.x) * 4);
+
+    std::cout << "r: " << static_cast<int>(pixels[0]) << '\n';
+    std::cout << "g: " << static_cast<int>(pixels[1]) << '\n';
+    std::cout << "b: " << static_cast<int>(pixels[2]) << '\n';
+    std::cout << "a: " << static_cast<int>(pixels[3]) << '\n' << std::endl;
 }
 
 
@@ -100,7 +93,7 @@ int main() {
     int imageWidth(0);
     int imageHeight(0);
     GLuint image(0);
-    bool ret = LoadTextureFromFile("../foo.png", &image, &imageWidth, &imageHeight,ImVec2(0,0));
+    bool ret = LoadTextureFromFile("../foo.png", &image, &imageWidth, &imageHeight);
     IM_ASSERT(ret);
 
     // Declaring dimensions and some vectors
@@ -137,7 +130,7 @@ int main() {
         // Add first and second point
         if (is_hovered && ImGui::IsMouseClicked(ImGuiMouseButton_Left)) {
             mouse_pos_in_canvas = ImVec2(io.MousePos.x - origin.x, io.MousePos.y - origin.y);
-            LoadTextureFromFile("../foo.png", &image, &imageWidth, &imageHeight, mouse_pos_in_canvas);
+           readPixelFromImage(mouse_pos_in_canvas);
         }
 
         ImGui::Text("Mouse pos in canvas: (%g, %g)", mouse_pos_in_canvas.x, mouse_pos_in_canvas.y);
