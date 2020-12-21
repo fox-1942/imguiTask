@@ -53,8 +53,9 @@ ImVec4 readPixelFromImage(ImVec2 mousePosition) {
     std::cout << "b: " << static_cast<int>(pixels[2]) << '\n';
     std::cout << "a: " << static_cast<int>(pixels[3]) << '\n' << std::endl;
 
-    return ImVec4(static_cast<int>(pixels[0])/255.0f, static_cast<int>(pixels[1])/255.0f, static_cast<int>(pixels[2])/255.0f,
-                  static_cast<int>(pixels[3])/255.0f);
+    return ImVec4(static_cast<int>(pixels[0]) / 255.0f, static_cast<int>(pixels[1]) / 255.0f,
+                  static_cast<int>(pixels[2]) / 255.0f,
+                  static_cast<int>(pixels[3]) / 255.0f);
 }
 
 int main() {
@@ -99,7 +100,6 @@ int main() {
 
     // Declaring dimensions and some vectors
 
-    ImVec2 origin(0, 0);
     ImVec2 mouse_pos_in_canvas(0, 0);
     ImVec4 color = ImVec4(114.0f / 255.0f, 144.0f / 255.0f, 154.0f / 255.0f, 200.0f / 255.0f);
 
@@ -112,33 +112,31 @@ int main() {
 
         ImGui::Begin("OpenGL Texture Text");
 
-        ImVec2 canvas_p0(ImGui::GetCursorScreenPos().x,
-                         ImGui::GetCursorScreenPos().y);
+        ImVec2 canvas_p0(ImGui::GetCursorScreenPos().x, ImGui::GetCursorScreenPos().y);
 
         ImGuiIO &io = ImGui::GetIO();
-
+        ImDrawList *draw_list = ImGui::GetWindowDrawList();
         ImGui::Image((void *) (intptr_t) image, ImVec2(imageWidth, imageHeight));
+
+        // Creating invisible canvas before the loaded image
+        ImVec2 canvas_p1 = ImVec2(canvas_p0.x + imageWidth, canvas_p0.y + imageHeight);
+        draw_list->AddRectFilled(canvas_p0, canvas_p1, IM_COL32(50, 50, 50, 0));
+        
         const bool is_hovered = ImGui::IsItemHovered();
 
-        origin = ImVec2(canvas_p0.x, canvas_p0.y);
-
-
-        static ImVec4 colf = ImVec4(0, 0, 0.4f, 0);
-        const ImU32 col = ImColor(colf);
-
-
         if (is_hovered && ImGui::IsMouseClicked(ImGuiMouseButton_Left)) {
-            mouse_pos_in_canvas = ImVec2(io.MousePos.x - origin.x, io.MousePos.y - origin.y);
+            mouse_pos_in_canvas = ImVec2(io.MousePos.x - canvas_p0.x, io.MousePos.y - canvas_p0.y);
             color = readPixelFromImage(mouse_pos_in_canvas);
-
-            ImDrawList* draw_list = ImGui::GetWindowDrawList();
-            draw_list->AddLine(ImVec2(canvas_p0.x + 10, canvas_p0.y), ImVec2(canvas_p0.x + 10, canvas_p0.y),
-                               IM_COL32(200, 200, 200, 40));
+            //   draw_list->AddLine(ImVec2(canvas_p0.x + 10, canvas_p0.y), ImVec2(canvas_p0.x + 10, canvas_p0.y),
+            //                    IM_COL32(200, 200, 200, 40));
         }
+
+        // Draw border and background color
+
         static bool no_border = false;
         ImGui::Checkbox("ImGuiColorEditFlags_NoBorder", &no_border);
         ImGui::Text("Sampled Color:");
-        ImGui::ColorButton("ColorField",  color,  (no_border ? ImGuiColorEditFlags_NoBorder : 0), ImVec2(80, 80));
+        ImGui::ColorButton("ColorField", color, (no_border ? ImGuiColorEditFlags_NoBorder : 0), ImVec2(80, 80));
 
         ImGui::Text("Mouse pos in canvas: (%g, %g)", mouse_pos_in_canvas.x, mouse_pos_in_canvas.y);
         ImGui::Text("Mouse pos in screen: (%g, %g)", io.MousePos.x, io.MousePos.y);
