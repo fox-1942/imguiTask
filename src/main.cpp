@@ -2,6 +2,8 @@
 #include <iostream>
 #include <glfw3.h>
 #include "imgui.h"
+#include <imgui_internal.h>
+
 #include "imgui_impl_glfw.h"
 #include "imgui_impl_opengl3.h"
 #include "stdio.h"
@@ -83,7 +85,7 @@ int main() {
     (void) io;
 
 
-    ImGui::StyleColorsLight();
+    ImGui::StyleColorsDark();
     ImGui_ImplGlfw_InitForOpenGL(window, true);
     ImGui_ImplOpenGL3_Init("#version 460");
     ImVec4 clear_color = ImVec4(30.0f/255.0f, 144.0f/255.0f, 200.0f/255.0f, 1.00f);
@@ -99,7 +101,7 @@ int main() {
     // Declaring dimensions and some vectors
 
     ImVec2 mouse_pos_in_canvas(0, 0);
-    ImVec4 color = ImVec4(255.0f,  255.0f,  255.0f,  255.0f);
+    ImVec4 color = ImVec4(1.0f,  1.0f,  1.0f,  1.0f);
     bool clicked = false;
 
     while (!glfwWindowShouldClose(window)) {
@@ -147,7 +149,17 @@ int main() {
         ImGui::Dummy(ImVec2(0.0f, 20.0f));
         ImGui::Text("Sampled Color:");
 
-        ImGui::ColorButton("Selected color", color,0 , ImVec2(80, 80));
+        ImGui::ColorButton("Selected color", color,0 , ImVec2(87, 87));
+
+        ImGui::SameLine();
+        ImGui::BeginGroup();
+        ImGui::PushItemFlag(ImGuiItemFlags_Disabled, true);
+           ImGui::SliderFloat("Red", &color.x, 0.0f, 1.0f, "%.1f");
+            ImGui::SliderFloat("Green ", &color.y, 0.0f, 1.0f, "%.1f" );
+            ImGui::SliderFloat("Blue", &color.z, 0.0f, 1.0f, "%.1f" );
+            ImGui::SliderFloat("Alpha", &color.w, 0.0f, 1.0f, "%.1f");
+        ImGui::PopItemFlag();
+        ImGui::EndGroup();
 
         ImGui::Text("Mouse pos in canvas: (%g, %g)", mouse_pos_in_canvas.x, mouse_pos_in_canvas.y);
         ImGui::Text("Mouse pos in screen: (%g, %g)", io.MousePos.x, io.MousePos.y);
