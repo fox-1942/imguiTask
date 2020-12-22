@@ -178,12 +178,10 @@ int main() {
          ImGui::Text("Mouse pos in screen: (%g, %g)", io.MousePos.x, io.MousePos.y);*/
 
 
-
-
 //----------------------------------------------------------------------------------------
         ImGui::End();
 
-        ImGui::SetNextWindowSize(ImVec2(400, 300), ImGuiCond_Always);
+        ImGui::SetNextWindowSize(ImVec2(400, 600), ImGuiCond_Always);
         ImGui::Begin("Color mixer");
 
         ImGui::Dummy(ImVec2(0.0, 20.0f));
@@ -231,6 +229,15 @@ int main() {
         ImGui::SliderFloat("Saturation", &selectedColor->Value.y, -100.0f, 100.0f, "%.1f");
         ImGui::SliderFloat("Luma", &selectedColor->Value.z, -100, 100.0f, "%.1f");
         ImGui::EndGroup();
+        
+        if ( ImGui::Button("Reset")) {
+            red = ImColor::HSV(0.0f, 1.0f, 1.0f, 1.0f);
+            green = ImColor::HSV(0.382f, 1.0f, 1.0f, 1.0f);
+            blue = ImColor::HSV(0.520f, 1.0f, 1.0f, 1.0f);
+            cyan = ImColor::HSV(0.5, 1.0f, 1.0f);
+            magenta = ImColor::HSV(0.838f, 1.0f, 1.0f);
+            yellow = ImColor::HSV(0.162f, 1.0f, 1.0f);
+        }
 
         ImGui::End();
         ImGui::Render();
