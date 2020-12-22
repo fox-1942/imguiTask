@@ -155,11 +155,29 @@ int main() {
         ImGui::SliderFloat("Alpha", &color.w, 0.0f, 1.0f, "%.1f");
         ImGui::PopItemFlag();
         ImGui::EndGroup();
-
         ImGui::End();
+
 
         ImGui::SetNextWindowSize(ImVec2(400, 400), ImGuiCond_Always);
         ImGui::Begin("Vectors");
+
+
+        ImVec2 canvas2_p0 = ImGui::GetCursorScreenPos();
+        ImGui::Image((void *) (intptr_t) eye_image, ImVec2(eyeImageWidth, eyeImageHeight));
+        ImVec2 canvas2_p1 = ImVec2(canvas2_p0.x + eyeImageWidth, canvas2_p0.y + eyeImageHeight);
+
+        draw_list = ImGui::GetWindowDrawList();
+        draw_list->AddRectFilled(canvas2_p0, canvas2_p1, IM_COL32(255, 0, 0, 100));
+
+        ImGui::PushStyleVar(ImGuiStyleVar_Alpha, ImGui::GetStyle().Alpha * 0.0f);
+        ImGui::Checkbox("###343", &disabled);
+        ImGui::PopStyleVar();
+
+        if (disabled)
+        {
+            ImGui::PushItemFlag(ImGuiItemFlags_Disabled, true);
+            ImGui::PushStyleVar(ImGuiStyleVar_Alpha, ImGui::GetStyle().Alpha * 0.5f);
+        }
 
         ImGui::Dummy(ImVec2(0.0, 20.0f));
         ImGui::Indent(70.0f);
@@ -208,6 +226,14 @@ int main() {
         ImGui::SliderFloat("Luma", &selectedColor->z, -100, 100.0f, "%.1f");
         ImGui::EndGroup();
 
+        if (disabled)
+        {
+            ImGui::PopItemFlag();
+            ImGui::PopStyleVar();
+        }
+
+
+
 
         ImGui::Dummy(ImVec2(0.0, 20.0f));
         if ( ImGui::Button("Reset")) {
@@ -221,10 +247,10 @@ int main() {
 
         ImGui::SameLine();
         ImGui::Indent(230.0f);
-        ImGui::Image((void *) (intptr_t) eye_image, ImVec2(eyeImageWidth, eyeImageHeight));
-        if (is_hovered && ImGui::IsMouseClicked(ImGuiMouseButton_Left)) {
 
-        }
+
+
+
         ImGui::Indent(-233.0f);
         ImGui::Dummy(ImVec2(0.0, 20.0f));
         ImGui::Text(" HSV sliders issue information:\n https://github.com/ocornut/imgui/issues/2722");
