@@ -85,10 +85,10 @@ int main() {
     (void) io;
 
 
-    ImGui::StyleColorsDark();
+    ImGui::StyleColorsLight();
     ImGui_ImplGlfw_InitForOpenGL(window, true);
     ImGui_ImplOpenGL3_Init("#version 460");
-    ImVec4 clear_color = ImVec4(30.0f/255.0f, 144.0f/255.0f, 200.0f/255.0f, 1.00f);
+    ImVec4 clear_color = ImVec4(30.0f / 255.0f, 144.0f / 255.0f, 200.0f / 255.0f, 1.00f);
 
 
     // Loading image
@@ -101,7 +101,7 @@ int main() {
     // Declaring dimensions and some vectors
 
     ImVec2 mouse_pos_in_canvas(0, 0);
-    ImVec4 color = ImVec4(0.5f,  0.5f,  0.5f,  0.0f);
+    ImVec4 color = ImVec4(0.5f, 0.5f, 0.5f, 0.0f);
     bool clicked = false;
 
     while (!glfwWindowShouldClose(window)) {
@@ -110,7 +110,7 @@ int main() {
         ImGui_ImplOpenGL3_NewFrame();
         ImGui_ImplGlfw_NewFrame();
         ImGui::NewFrame();
-        ImGui::SetNextWindowSize(ImVec2(530,700),ImGuiCond_Always);
+        ImGui::SetNextWindowSize(ImVec2(530, 700), ImGuiCond_Always);
         ImGui::Begin("Color Picker for image");
 
         ImVec2 canvas_p0 = ImGui::GetCursorScreenPos();
@@ -134,35 +134,39 @@ int main() {
         }
 
         if (clicked) {
-            float diff=30;
+            float diff = 30;
 
-            ImVec2 startingPoint_H=ImVec2(canvas_p0.x + mouse_pos_in_canvas.x-diff,canvas_p0.y + mouse_pos_in_canvas.y );
-            ImVec2 endingPoint_H=ImVec2(canvas_p0.x + mouse_pos_in_canvas.x+diff,canvas_p0.y + mouse_pos_in_canvas.y );
-            draw_list->AddLine(startingPoint_H,endingPoint_H,IM_COL32(0, 100, 0, 100),5);
+            ImVec2 startingPoint_H = ImVec2(canvas_p0.x + mouse_pos_in_canvas.x - diff,
+                                            canvas_p0.y + mouse_pos_in_canvas.y);
+            ImVec2 endingPoint_H = ImVec2(canvas_p0.x + mouse_pos_in_canvas.x + diff,
+                                          canvas_p0.y + mouse_pos_in_canvas.y);
+            draw_list->AddLine(startingPoint_H, endingPoint_H, IM_COL32(0, 100, 0, 100), 5);
 
-            ImVec2 startingPoint_V=ImVec2(canvas_p0.x + mouse_pos_in_canvas.x,canvas_p0.y + mouse_pos_in_canvas.y-diff );
-            ImVec2 endingPoint_V=ImVec2(canvas_p0.x + mouse_pos_in_canvas.x,canvas_p0.y + mouse_pos_in_canvas.y+diff );
-            draw_list->AddLine(startingPoint_V,endingPoint_V,IM_COL32(0, 100, 0, 100),5);
+            ImVec2 startingPoint_V = ImVec2(canvas_p0.x + mouse_pos_in_canvas.x,
+                                            canvas_p0.y + mouse_pos_in_canvas.y - diff);
+            ImVec2 endingPoint_V = ImVec2(canvas_p0.x + mouse_pos_in_canvas.x,
+                                          canvas_p0.y + mouse_pos_in_canvas.y + diff);
+            draw_list->AddLine(startingPoint_V, endingPoint_V, IM_COL32(0, 100, 0, 100), 5);
 
         }
         draw_list->PopClipRect();
         ImGui::Dummy(ImVec2(0.0f, 20.0f));
         ImGui::Text("Sampled Color:");
 
-        ImGui::ColorButton("Sampled color", color,ImGuiColorEditFlags_AlphaPreview , ImVec2(87, 87));
+        ImGui::ColorButton("Sampled color", color, ImGuiColorEditFlags_AlphaPreview, ImVec2(87, 87));
 
         ImGui::SameLine();
         ImGui::BeginGroup();
         ImGui::PushItemFlag(ImGuiItemFlags_Disabled, true);
-           ImGui::SliderFloat("Red", &color.x, 0.0f, 1.0f, "%.1f");
-            ImGui::SliderFloat("Green ", &color.y, 0.0f, 1.0f, "%.1f" );
-            ImGui::SliderFloat("Blue", &color.z, 0.0f, 1.0f, "%.1f" );
-            ImGui::SliderFloat("Alpha", &color.w, 0.0f, 1.0f, "%.1f");
+        ImGui::SliderFloat("Red", &color.x, 0.0f, 1.0f, "%.1f");
+        ImGui::SliderFloat("Green ", &color.y, 0.0f, 1.0f, "%.1f");
+        ImGui::SliderFloat("Blue", &color.z, 0.0f, 1.0f, "%.1f");
+        ImGui::SliderFloat("Alpha", &color.w, 0.0f, 1.0f, "%.1f");
         ImGui::PopItemFlag();
         ImGui::EndGroup();
 
-       /* ImGui::Text("Mouse pos in canvas: (%g, %g)", mouse_pos_in_canvas.x, mouse_pos_in_canvas.y);
-        ImGui::Text("Mouse pos in screen: (%g, %g)", io.MousePos.x, io.MousePos.y);*/
+        /* ImGui::Text("Mouse pos in canvas: (%g, %g)", mouse_pos_in_canvas.x, mouse_pos_in_canvas.y);
+         ImGui::Text("Mouse pos in screen: (%g, %g)", io.MousePos.x, io.MousePos.y);*/
 
 
 
@@ -170,21 +174,36 @@ int main() {
 //----------------------------------------------------------------------------------------
         ImGui::End();
 
-        ImGui::SetNextWindowSize(ImVec2(530,700),ImGuiCond_Always);
+        ImGui::SetNextWindowSize(ImVec2(300, 600), ImGuiCond_Always);
         ImGui::Begin("Color mixer");
 
-        static int e = 0;
+        ImColor red = ImColor::HSV(0.0f, 1.0f, 1.0f, 1.0f);
+        ImColor green = ImColor::HSV(0.382f, 1.0f, 1.0f, 1.0f);
+        ImColor blue = ImColor::HSV(0.520f, 1.0f, 1.0f, 1.0f);
+        ImColor cyan = ImColor(0.0, 255.0f, 255.0f);
+        ImColor magenta = ImColor(255.0f, 0.0f, 255.0f);
+        ImColor yellow = ImColor::HSV(0.162f, 1.0f, 1.0f);
 
         ImGui::Dummy(ImVec2(0.0, 20.0f));
-        ImGui::Indent(15.0f);
+        ImGui::Indent(40.0f);
         ImGui::BeginGroup();
-        ImGui::RadioButton(" ###1", &e, 0); ImGui::SameLine();
-        ImGui::RadioButton(" ###2", &e, 1); ImGui::SameLine();
-        ImGui::RadioButton(" ###3", &e, 2); ImGui::SameLine();
-        ImGui::RadioButton(" ###4", &e, 3); ImGui::SameLine();
-        ImGui::RadioButton(" ###5", &e, 4); ImGui::SameLine();
-        ImGui::RadioButton(" ###6", &e, 5);
+
+        static int e = 0;
+        ImGui::RadioButton(" ###1", &e, 0, red);
+        ImGui::SameLine();
+        ImGui::RadioButton(" ###2", &e, 1, green);
+        ImGui::SameLine();
+        ImGui::RadioButton(" ###3", &e, 2, blue);
+        ImGui::SameLine();
+        ImGui::RadioButton(" ###4", &e, 3, cyan );
+        ImGui::SameLine();
+        ImGui::RadioButton(" ###5", &e, 4, magenta);
+        ImGui::SameLine();
+        ImGui::RadioButton(" ###6", &e, 5, yellow);
         ImGui::EndGroup();
+
+
+
 
 
 

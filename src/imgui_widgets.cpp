@@ -1204,6 +1204,78 @@ bool ImGui::RadioButton(const char* label, int* v, int v_button)
     return pressed;
 }
 
+//Some overloaded methods for radiobutton
+
+bool ImGui::RadioButton(const char* label, bool active, ImU32 mainColor  )
+{
+    ImGuiWindow* window = GetCurrentWindow();
+    if (window->SkipItems)
+        return false;
+
+    ImGuiContext& g = *GImGui;
+    const ImGuiStyle& style = g.Style;
+    const ImGuiID id = window->GetID(label);
+    const ImVec2 label_size = CalcTextSize(label, NULL, true);
+
+    const float square_sz = GetFrameHeight();
+    const ImVec2 pos = window->DC.CursorPos;
+    const ImRect check_bb(pos, pos + ImVec2(square_sz, square_sz));
+    const ImRect total_bb(pos, pos + ImVec2(square_sz + (label_size.x > 0.0f ? style.ItemInnerSpacing.x + label_size.x : 0.0f), label_size.y + style.FramePadding.y * 2.0f));
+    ItemSize(total_bb, style.FramePadding.y);
+    if (!ItemAdd(total_bb, id))
+        return false;
+
+    ImVec2 center = check_bb.GetCenter();
+    center.x = IM_ROUND(center.x);
+    center.y = IM_ROUND(center.y);
+    const float radius = (square_sz - 1.0f) * 0.7f;
+
+    bool hovered, held;
+    bool pressed = ButtonBehavior(total_bb, id, &hovered, &held);
+    if (pressed)
+        MarkItemEdited(id);
+
+
+    RenderNavHighlight(total_bb, id);
+    window->DrawList->AddCircleFilled(center, radius, mainColor, 16);
+    if (active)
+    {
+        const float pad = ImMin(1.0f, IM_FLOOR(square_sz / 5.0f));
+        window->DrawList->AddCircle(center, radius + pad, GetColorU32(ImGuiCol_CheckMark), 32, 3.0);
+    }
+
+    if (style.FrameBorderSize > 0.0f)
+    {
+        window->DrawList->AddCircle(center + ImVec2(1, 1), radius, GetColorU32(ImGuiCol_BorderShadow), 16, style.FrameBorderSize);
+        window->DrawList->AddCircle(center, radius, GetColorU32(ImGuiCol_Border), 16, style.FrameBorderSize);
+    }
+
+    if (g.LogEnabled)
+        LogRenderedText(&total_bb.Min, active ? "(x)" : "( )");
+    if (label_size.x > 0.0f)
+        RenderText(ImVec2(check_bb.Max.x + style.ItemInnerSpacing.x, check_bb.Min.y + style.FramePadding.y), label);
+
+    IMGUI_TEST_ENGINE_ITEM_INFO(id, label, window->DC.ItemFlags);
+    return pressed;
+}
+
+// FIXME: This would work nicely if it was a public template, e.g. 'template<T> RadioButton(const char* label, T* v, T v_button)', but I'm not sure how we would expose it..
+bool ImGui::RadioButton(const char* label, int* v, int v_button, ImU32 mainColor)
+{
+    const bool pressed = RadioButton(label, *v == v_button, mainColor);
+    if (pressed)
+        *v = v_button;
+    return pressed;
+}
+
+
+
+
+
+//------------------------------------
+
+
+
 // size_arg (for each axis) < 0.0f: align to end, 0.0f: auto, > 0.0f: specified size
 void ImGui::ProgressBar(float fraction, const ImVec2& size_arg, const char* overlay)
 {
