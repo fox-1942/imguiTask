@@ -102,6 +102,7 @@ int main() {
 
     ImVec2 mouse_pos_in_canvas(0, 0);
     ImVec4 color = ImVec4(0.5f, 0.5f, 0.5f, 0.0f);
+    ImVec4 selectedColor = ImVec4(0.5f, 0.5f, 0.5f, 0.0f);
     bool clicked = false;
 
     while (!glfwWindowShouldClose(window)) {
@@ -174,28 +175,28 @@ int main() {
 //----------------------------------------------------------------------------------------
         ImGui::End();
 
-        ImGui::SetNextWindowSize(ImVec2(300, 600), ImGuiCond_Always);
+        ImGui::SetNextWindowSize(ImVec2(400, 600), ImGuiCond_Always);
         ImGui::Begin("Color mixer");
 
-        ImColor red = ImColor::HSV(0.0f, 1.0f, 1.0f, 1.0f);
-        ImColor green = ImColor::HSV(0.382f, 1.0f, 1.0f, 1.0f);
-        ImColor blue = ImColor::HSV(0.520f, 1.0f, 1.0f, 1.0f);
-        ImColor cyan = ImColor(0.0, 255.0f, 255.0f);
-        ImColor magenta = ImColor(255.0f, 0.0f, 255.0f);
-        ImColor yellow = ImColor::HSV(0.162f, 1.0f, 1.0f);
+        ImColor red = ImColor(0.0f, 1.0f, 1.0f, 1.0f);
+        ImColor green = ImColor(0.382f, 1.0f, 1.0f, 1.0f);
+        ImColor blue = ImColor(0.520f, 1.0f, 1.0f, 1.0f);
+        ImColor cyan = ImColor(0.5, 1.0f, 1.0f);
+        ImColor magenta = ImColor(0.838f, 1.0f, 1.0f);
+        ImColor yellow = ImColor(0.162f, 1.0f, 1.0f);
 
         ImGui::Dummy(ImVec2(0.0, 20.0f));
         ImGui::Indent(40.0f);
         ImGui::BeginGroup();
 
-        static int e = 0;
+        static int e = 1;
         ImGui::RadioButton(" ###1", &e, 0, red);
         ImGui::SameLine();
         ImGui::RadioButton(" ###2", &e, 1, green);
         ImGui::SameLine();
         ImGui::RadioButton(" ###3", &e, 2, blue);
         ImGui::SameLine();
-        ImGui::RadioButton(" ###4", &e, 3, cyan );
+        ImGui::RadioButton(" ###4", &e, 3, cyan);
         ImGui::SameLine();
         ImGui::RadioButton(" ###5", &e, 4, magenta);
         ImGui::SameLine();
@@ -203,15 +204,35 @@ int main() {
         ImGui::EndGroup();
 
 
+        switch (e) {
+            case 0:
+                selectedColor = red;
+                break;
+            case 1:
+                selectedColor = green;
+                break;
+            case 2:
+                selectedColor = blue;
+                break;
+            case 3:
+                selectedColor = cyan;
+                break;
+            case 4:
+                selectedColor = magenta;
+                break;
+            case 5:
+                selectedColor = yellow;
+                break;
+        }
 
-
-
-
-
+        ImGui::Dummy(ImVec2(0.0, 20.0f));
+        ImGui::BeginGroup();
+        ImGui::SliderFloat("Hue", &selectedColor.x, -180.0f, 180.0f, "%.1f");
+        ImGui::SliderFloat("Saturation", &selectedColor.y, -100.0f, 100.0f, "%.1f");
+        ImGui::SliderFloat("Luma", &selectedColor.z, -100, 100.0f, "%.1f");
+        ImGui::EndGroup();
 
         ImGui::End();
-
-
         ImGui::Render();
 
         glClearColor(clear_color.x, clear_color.y, clear_color.z, clear_color.w);
