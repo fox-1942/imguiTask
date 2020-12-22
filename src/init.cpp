@@ -1,3 +1,8 @@
+/*
+ * Copyright: Tamás Boros 2020
+ *
+ * */
+
 #include <gl3w.h>
 #include <iostream>
 #include <glfw3.h>
@@ -68,7 +73,7 @@ int main() {
 
 
     // Window creation
-    GLFWwindow *window = glfwCreateWindow(1280, 1000, "ImGui Task for Grand Color Central", NULL, NULL);
+    GLFWwindow *window = glfwCreateWindow(1280, 1000, "ImGui Task for Grand Color Central - Tamás Boros", NULL, NULL);
     if (window == NULL)
         return 1;
     glfwMakeContextCurrent(window);
@@ -92,16 +97,18 @@ int main() {
     // Loading images
     bool ret = LoadTextureFromFile("../lena.jpg", &image, &imageWidth, &imageHeight);
     IM_ASSERT(ret);
-    bool eye = LoadTextureFromFile("../eye.png", &eye_image, &eyeImageWidth, &eyeImageHeight);
-    IM_ASSERT(eye);
 
     while (!glfwWindowShouldClose(window)) {
         glfwPollEvents();
 
         ImGui_ImplOpenGL3_NewFrame();
         ImGui_ImplGlfw_NewFrame();
+
+
         ImGui::NewFrame();
         ImGui::SetNextWindowSize(ImVec2(530, 700), ImGuiCond_Always);
+
+
         ImGui::Begin("Color Picker for image");
 
         ImVec2 canvas_p0 = ImGui::GetCursorScreenPos();
@@ -158,20 +165,11 @@ int main() {
         ImGui::End();
 
 
-        ImGui::SetNextWindowSize(ImVec2(400, 400), ImGuiCond_Always);
+        ImGui::SetNextWindowSize(ImVec2(400, 390), ImGuiCond_Always);
         ImGui::Begin("Vectors");
 
-
-        ImVec2 canvas2_p0 = ImGui::GetCursorScreenPos();
-        ImGui::Image((void *) (intptr_t) eye_image, ImVec2(eyeImageWidth, eyeImageHeight));
-        ImVec2 canvas2_p1 = ImVec2(canvas2_p0.x + eyeImageWidth, canvas2_p0.y + eyeImageHeight);
-
-        draw_list = ImGui::GetWindowDrawList();
-        draw_list->AddRectFilled(canvas2_p0, canvas2_p1, IM_COL32(255, 0, 0, 100));
-
-        ImGui::PushStyleVar(ImGuiStyleVar_Alpha, ImGui::GetStyle().Alpha * 0.0f);
-        ImGui::Checkbox("###343", &disabled);
-        ImGui::PopStyleVar();
+        ImGui::Indent(100.0f);
+        ImGui::Checkbox("Disable mixer###343", &disabled);
 
         if (disabled)
         {
@@ -180,7 +178,7 @@ int main() {
         }
 
         ImGui::Dummy(ImVec2(0.0, 20.0f));
-        ImGui::Indent(70.0f);
+        ImGui::Indent(-50.0f);
         ImGui::BeginGroup();
 
         static int e = 1;
@@ -226,14 +224,6 @@ int main() {
         ImGui::SliderFloat("Luma", &selectedColor->z, -100, 100.0f, "%.1f");
         ImGui::EndGroup();
 
-        if (disabled)
-        {
-            ImGui::PopItemFlag();
-            ImGui::PopStyleVar();
-        }
-
-
-
 
         ImGui::Dummy(ImVec2(0.0, 20.0f));
         if ( ImGui::Button("Reset")) {
@@ -245,17 +235,24 @@ int main() {
             yellow = ImColor::HSV(0.162f, 1.0f, 1.0f);
         }
 
-        ImGui::SameLine();
-        ImGui::Indent(230.0f);
+
+        if (disabled)
+        {
+            ImGui::PopItemFlag();
+            ImGui::PopStyleVar();
+        }
 
 
 
 
-        ImGui::Indent(-233.0f);
+
+
+
         ImGui::Dummy(ImVec2(0.0, 20.0f));
-        ImGui::Text(" HSV sliders issue information:\n https://github.com/ocornut/imgui/issues/2722");
+        ImGui::Text("HSV sliders issue information:\n https://github.com/ocornut/imgui/issues/2722");
 
-
+        ImGui::Dummy(ImVec2(0.0, 20.0f));
+        ImGui::Text("Tamás Boros - 2020");
 
 
         ImGui::End();

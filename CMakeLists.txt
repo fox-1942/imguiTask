@@ -24,4 +24,5 @@ target_include_directories(${PROJECT_NAME} PUBLIC
 
 target_link_directories(${PROJECT_NAME} PUBLIC libs/GLFW)
 
-target_link_libraries(${PROJECT_NAME} opengl32 glfw3)
+link_libraries("-static")
+target_link_libraries(${PROJECT_NAME} opengl32 glfw3 "-static")

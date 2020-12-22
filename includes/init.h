@@ -21,8 +21,7 @@ ImVec2 mouse_pos_in_canvas(0, 0);
 ImVec4 color = ImVec4(0.5f, 0.5f, 0.5f, 0.0f);
 ImVec4 *selectedColor;
 bool clicked = false;
-bool clicked2=false;
 bool disabled = false;
-bool is_hovered2=false;
+
 
 #endif //IMGUITASK_INIT_H
