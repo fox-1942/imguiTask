@@ -91,15 +91,17 @@ int main() {
     ImVec4 clear_color = ImVec4(30.0f / 255.0f, 144.0f / 255.0f, 200.0f / 255.0f, 1.00f);
 
 
-    // Loading image
-    int imageWidth(0);
-    int imageHeight(0);
-    GLuint image(0);
+    // Loading images
+    int imageWidth(0), eyeImageWidth(0);
+    int imageHeight(0), eyeImageHeight(0);
+    GLuint image(0), eye_image(0);;
     bool ret = LoadTextureFromFile("../lena.jpg", &image, &imageWidth, &imageHeight);
     IM_ASSERT(ret);
+    bool eye = LoadTextureFromFile("../eye.png", &eye_image, &eyeImageWidth, &eyeImageHeight);
+    IM_ASSERT(eye);
+
 
     // Declaring dimensions and some vectors
-
     ImVec2 mouse_pos_in_canvas(0, 0);
     ImVec4 color = ImVec4(0.5f, 0.5f, 0.5f, 0.0f);
     ImColor* selectedColor;
@@ -201,6 +203,7 @@ int main() {
         ImGui::SameLine();
         ImGui::RadioButton(" ###6", &e, 5, yellow);
         ImGui::EndGroup();
+        ImGui::Dummy(ImVec2(0.0, 10.0f));
 
         switch (e) {
             case 0:
@@ -223,7 +226,7 @@ int main() {
                 break;
         }
 
-        ImGui::Dummy(ImVec2(0.0, 20.0f));
+
         ImGui::Indent(-30.0f);
         ImGui::BeginGroup();
         ImGui::SliderFloat("Hue", &selectedColor->Value.x, -180.0f, 180.0f, "%.1f");
@@ -231,6 +234,7 @@ int main() {
         ImGui::SliderFloat("Luma", &selectedColor->Value.z, -100, 100.0f, "%.1f");
         ImGui::EndGroup();
 
+        ImGui::Dummy(ImVec2(0.0, 20.0f));
         if ( ImGui::Button("Reset")) {
             red = ImColor::HSV(0.0f, 1.0f, 1.0f, 1.0f);
             green = ImColor::HSV(0.382f, 1.0f, 1.0f, 1.0f);
@@ -239,6 +243,16 @@ int main() {
             magenta = ImColor::HSV(0.838f, 1.0f, 1.0f);
             yellow = ImColor::HSV(0.162f, 1.0f, 1.0f);
         }
+
+        ImGui::SameLine();
+        ImGui::Indent(230.0f);
+        ImGui::Image((void *) (intptr_t) eye_image, ImVec2(eyeImageWidth, eyeImageHeight));
+
+        if (is_hovered && ImGui::IsMouseClicked(ImGuiMouseButton_Left)) {
+
+        }
+
+
 
         ImGui::End();
         ImGui::Render();
