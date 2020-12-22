@@ -5,7 +5,7 @@ set(CMAKE_CXX_STANDARD 17)
 
 add_executable(${PROJECT_NAME}
         src/gl3w.c
-        src/main.cpp
+        src/init.cpp
         src/imgui.cpp
         src/imgui_draw.cpp
         src/imgui_impl_glfw.cpp

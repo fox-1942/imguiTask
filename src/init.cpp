@@ -7,7 +7,7 @@
 #include "imgui_impl_glfw.h"
 #include "imgui_impl_opengl3.h"
 #include "stdio.h"
-#include "GLFW/glfw3.h"
+#include "init.h"
 
 #define STB_IMAGE_IMPLEMENTATION
 
@@ -84,36 +84,16 @@ int main() {
     ImGuiIO &io = ImGui::GetIO();
     (void) io;
 
-
     ImGui::StyleColorsDark();
     ImGui_ImplGlfw_InitForOpenGL(window, true);
     ImGui_ImplOpenGL3_Init("#version 460");
     ImVec4 clear_color = ImVec4(30.0f / 255.0f, 144.0f / 255.0f, 200.0f / 255.0f, 1.00f);
 
-
     // Loading images
-    int imageWidth(0), eyeImageWidth(0);
-    int imageHeight(0), eyeImageHeight(0);
-    GLuint image(0), eye_image(0);;
     bool ret = LoadTextureFromFile("../lena.jpg", &image, &imageWidth, &imageHeight);
     IM_ASSERT(ret);
     bool eye = LoadTextureFromFile("../eye.png", &eye_image, &eyeImageWidth, &eyeImageHeight);
     IM_ASSERT(eye);
-
-
-    // Declaring dimensions and some vectors
-    ImVec2 mouse_pos_in_canvas(0, 0);
-    ImVec4 color = ImVec4(0.5f, 0.5f, 0.5f, 0.0f);
-    ImColor* selectedColor;
-    bool clicked = false;
-
-    ImColor red = ImColor::HSV(0.0f, 1.0f, 1.0f, 1.0f);
-    ImColor green = ImColor::HSV(0.382f, 1.0f, 1.0f, 1.0f);
-    ImColor blue = ImColor::HSV(0.520f, 1.0f, 1.0f, 1.0f);
-    ImColor cyan = ImColor::HSV(0.5, 1.0f, 1.0f);
-    ImColor magenta = ImColor::HSV(0.838f, 1.0f, 1.0f);
-    ImColor yellow = ImColor::HSV(0.162f, 1.0f, 1.0f);
-
 
     while (!glfwWindowShouldClose(window)) {
         glfwPollEvents();
@@ -169,18 +149,13 @@ int main() {
         ImGui::SameLine();
         ImGui::BeginGroup();
         ImGui::PushItemFlag(ImGuiItemFlags_Disabled, true);
-        ImGui::SliderFloat("Red", &color.x, 0.0f, 1.0f, "%.1f");
-        ImGui::SliderFloat("Green ", &color.y, 0.0f, 1.0f, "%.1f");
-        ImGui::SliderFloat("Blue", &color.z, 0.0f, 1.0f, "%.1f");
+        ImGui::SliderFloat("Red", &color.x, -180.0f, 18.0f, "%.1f");
+        ImGui::SliderFloat("Green ", &color.y, -100.0f, 100.0f, "%.1f");
+        ImGui::SliderFloat("Blue", &color.z, -100.0f, 100.0f, "%.1f");
         ImGui::SliderFloat("Alpha", &color.w, 0.0f, 1.0f, "%.1f");
         ImGui::PopItemFlag();
         ImGui::EndGroup();
 
-        /* ImGui::Text("Mouse pos in canvas: (%g, %g)", mouse_pos_in_canvas.x, mouse_pos_in_canvas.y);
-         ImGui::Text("Mouse pos in screen: (%g, %g)", io.MousePos.x, io.MousePos.y);*/
-
-
-//----------------------------------------------------------------------------------------
         ImGui::End();
 
         ImGui::SetNextWindowSize(ImVec2(400, 400), ImGuiCond_Always);
@@ -191,17 +166,17 @@ int main() {
         ImGui::BeginGroup();
 
         static int e = 1;
-        ImGui::RadioButton(" ###1", &e, 0, red);
+        ImGui::RadioButton(" ###1", &e, 0, ImGui::GetColorU32(red));
         ImGui::SameLine();
-        ImGui::RadioButton(" ###2", &e, 1, green);
+        ImGui::RadioButton(" ###2", &e, 1, ImGui::GetColorU32(green));
         ImGui::SameLine();
-        ImGui::RadioButton(" ###3", &e, 2, blue);
+        ImGui::RadioButton(" ###3", &e, 2, ImGui::GetColorU32(blue));
         ImGui::SameLine();
-        ImGui::RadioButton(" ###4", &e, 3, cyan);
+        ImGui::RadioButton(" ###4", &e, 3,ImGui::GetColorU32(cyan));
         ImGui::SameLine();
-        ImGui::RadioButton(" ###5", &e, 4, magenta);
+        ImGui::RadioButton(" ###5", &e, 4, ImGui::GetColorU32(magenta));
         ImGui::SameLine();
-        ImGui::RadioButton(" ###6", &e, 5, yellow);
+        ImGui::RadioButton(" ###6", &e, 5,ImGui::GetColorU32( yellow));
         ImGui::EndGroup();
         ImGui::Dummy(ImVec2(0.0, 10.0f));
 
@@ -226,13 +201,13 @@ int main() {
                 break;
         }
 
-
         ImGui::Indent(-30.0f);
         ImGui::BeginGroup();
-        ImGui::SliderFloat("Hue", &selectedColor->Value.x, -180.0f, 180.0f, "%.1f");
-        ImGui::SliderFloat("Saturation", &selectedColor->Value.y, -100.0f, 100.0f, "%.1f");
-        ImGui::SliderFloat("Luma", &selectedColor->Value.z, -100, 100.0f, "%.1f");
+        ImGui::SliderFloat("Hue", &selectedColor->x, -180.0f, 180.0f, "%.1f");
+        ImGui::SliderFloat("Saturation", &selectedColor->y, -100.0f, 100.0f, "%.1f");
+        ImGui::SliderFloat("Luma", &selectedColor->z, -100, 100.0f, "%.1f");
         ImGui::EndGroup();
+
 
         ImGui::Dummy(ImVec2(0.0, 20.0f));
         if ( ImGui::Button("Reset")) {
@@ -247,10 +222,13 @@ int main() {
         ImGui::SameLine();
         ImGui::Indent(230.0f);
         ImGui::Image((void *) (intptr_t) eye_image, ImVec2(eyeImageWidth, eyeImageHeight));
-
         if (is_hovered && ImGui::IsMouseClicked(ImGuiMouseButton_Left)) {
 
         }
+        ImGui::Indent(-233.0f);
+        ImGui::Dummy(ImVec2(0.0, 20.0f));
+        ImGui::Text(" HSV sliders issue information:\n https://github.com/ocornut/imgui/issues/2722");
+
 
 
 
