@@ -181,11 +181,11 @@ int main() {
 //----------------------------------------------------------------------------------------
         ImGui::End();
 
-        ImGui::SetNextWindowSize(ImVec2(400, 600), ImGuiCond_Always);
-        ImGui::Begin("Color mixer");
+        ImGui::SetNextWindowSize(ImVec2(400, 400), ImGuiCond_Always);
+        ImGui::Begin("Vectors");
 
         ImGui::Dummy(ImVec2(0.0, 20.0f));
-        ImGui::Indent(50.0f);
+        ImGui::Indent(70.0f);
         ImGui::BeginGroup();
 
         static int e = 1;
@@ -224,12 +224,13 @@ int main() {
         }
 
         ImGui::Dummy(ImVec2(0.0, 20.0f));
+        ImGui::Indent(-30.0f);
         ImGui::BeginGroup();
         ImGui::SliderFloat("Hue", &selectedColor->Value.x, -180.0f, 180.0f, "%.1f");
         ImGui::SliderFloat("Saturation", &selectedColor->Value.y, -100.0f, 100.0f, "%.1f");
         ImGui::SliderFloat("Luma", &selectedColor->Value.z, -100, 100.0f, "%.1f");
         ImGui::EndGroup();
-        
+
         if ( ImGui::Button("Reset")) {
             red = ImColor::HSV(0.0f, 1.0f, 1.0f, 1.0f);
             green = ImColor::HSV(0.382f, 1.0f, 1.0f, 1.0f);
