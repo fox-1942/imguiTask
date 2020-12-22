@@ -855,6 +855,7 @@ namespace ImGui
     IMGUI_API void*         MemAlloc(size_t size);
     IMGUI_API void          MemFree(void* ptr);
 
+    bool RadioButton(const char *label, bool active, ImU32 buttonMainColor);
 } // namespace ImGui
 
 //-----------------------------------------------------------------------------

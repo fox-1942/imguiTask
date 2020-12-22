@@ -1141,7 +1141,7 @@ bool ImGui::CheckboxFlags(const char* label, unsigned int* flags, unsigned int f
     return CheckboxFlagsT(label, flags, flags_value);
 }
 
-bool ImGui::RadioButton(const char* label, bool active)
+bool ImGui::RadioButton(const char* label, bool active )
 {
     ImGuiWindow* window = GetCurrentWindow();
     if (window->SkipItems)
@@ -1170,12 +1170,14 @@ bool ImGui::RadioButton(const char* label, bool active)
     if (pressed)
         MarkItemEdited(id);
 
+    ImU32 coltest=IM_COL32(255, 0, 0, 100);
+
     RenderNavHighlight(total_bb, id);
-    window->DrawList->AddCircleFilled(center, radius, GetColorU32((held && hovered) ? ImGuiCol_FrameBgActive : hovered ? ImGuiCol_FrameBgHovered : ImGuiCol_FrameBg), 16);
+    window->DrawList->AddCircleFilled(center, radius, GetColorU32((held && hovered) ? ImGuiCol_FrameBgActive : hovered ? coltest : coltest), 16);
     if (active)
     {
-        const float pad = ImMax(1.0f, IM_FLOOR(square_sz / 6.0f));
-        window->DrawList->AddCircleFilled(center, radius - pad, GetColorU32(ImGuiCol_CheckMark), 16);
+        const float pad = ImMin(1.0f, IM_FLOOR(square_sz / 5.0f));
+        window->DrawList->AddCircle(center, radius + pad, GetColorU32(ImGuiCol_CheckMark), 32, 3.0);
     }
 
     if (style.FrameBorderSize > 0.0f)
@@ -5265,6 +5267,8 @@ bool ImGui::ColorButton(const char* desc_id, const ImVec4& col, ImGuiColorEditFl
         flags &= ~(ImGuiColorEditFlags_AlphaPreview | ImGuiColorEditFlags_AlphaPreviewHalf);
 
     ImVec4 col_rgb = col;
+
+    //std::cout<<"Colorbutton metódusban lévő color: "<< col_rgb.x<<" "<< col_rgb.y<<" "<< col_rgb.z<<std::endl;
 
     if (flags & ImGuiColorEditFlags_InputHSV)
         ColorConvertHSVtoRGB(col_rgb.x, col_rgb.y, col_rgb.z, col_rgb.x, col_rgb.y, col_rgb.z);

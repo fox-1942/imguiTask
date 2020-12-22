@@ -101,7 +101,7 @@ int main() {
     // Declaring dimensions and some vectors
 
     ImVec2 mouse_pos_in_canvas(0, 0);
-    ImVec4 color = ImVec4(1.0f,  1.0f,  1.0f,  1.0f);
+    ImVec4 color = ImVec4(0.5f,  0.5f,  0.5f,  0.0f);
     bool clicked = false;
 
     while (!glfwWindowShouldClose(window)) {
@@ -110,8 +110,8 @@ int main() {
         ImGui_ImplOpenGL3_NewFrame();
         ImGui_ImplGlfw_NewFrame();
         ImGui::NewFrame();
-        ImGui::SetNextWindowSize(ImVec2(530,900),ImGuiCond_Always);
-        ImGui::Begin("Color Picker for images");
+        ImGui::SetNextWindowSize(ImVec2(530,700),ImGuiCond_Always);
+        ImGui::Begin("Color Picker for image");
 
         ImVec2 canvas_p0 = ImGui::GetCursorScreenPos();
 
@@ -149,7 +149,7 @@ int main() {
         ImGui::Dummy(ImVec2(0.0f, 20.0f));
         ImGui::Text("Sampled Color:");
 
-        ImGui::ColorButton("Selected color", color,0 , ImVec2(87, 87));
+        ImGui::ColorButton("Sampled color", color,ImGuiColorEditFlags_AlphaPreview , ImVec2(87, 87));
 
         ImGui::SameLine();
         ImGui::BeginGroup();
@@ -161,14 +161,38 @@ int main() {
         ImGui::PopItemFlag();
         ImGui::EndGroup();
 
-        ImGui::Text("Mouse pos in canvas: (%g, %g)", mouse_pos_in_canvas.x, mouse_pos_in_canvas.y);
-        ImGui::Text("Mouse pos in screen: (%g, %g)", io.MousePos.x, io.MousePos.y);
+       /* ImGui::Text("Mouse pos in canvas: (%g, %g)", mouse_pos_in_canvas.x, mouse_pos_in_canvas.y);
+        ImGui::Text("Mouse pos in screen: (%g, %g)", io.MousePos.x, io.MousePos.y);*/
 
 
 
 
 //----------------------------------------------------------------------------------------
         ImGui::End();
+
+        ImGui::SetNextWindowSize(ImVec2(530,700),ImGuiCond_Always);
+        ImGui::Begin("Color mixer");
+
+        static int e = 0;
+
+        ImGui::Dummy(ImVec2(0.0, 20.0f));
+        ImGui::Indent(15.0f);
+        ImGui::BeginGroup();
+        ImGui::RadioButton(" ###1", &e, 0); ImGui::SameLine();
+        ImGui::RadioButton(" ###2", &e, 1); ImGui::SameLine();
+        ImGui::RadioButton(" ###3", &e, 2); ImGui::SameLine();
+        ImGui::RadioButton(" ###4", &e, 3); ImGui::SameLine();
+        ImGui::RadioButton(" ###5", &e, 4); ImGui::SameLine();
+        ImGui::RadioButton(" ###6", &e, 5);
+        ImGui::EndGroup();
+
+
+
+
+
+        ImGui::End();
+
+
         ImGui::Render();
 
         glClearColor(clear_color.x, clear_color.y, clear_color.z, clear_color.w);
