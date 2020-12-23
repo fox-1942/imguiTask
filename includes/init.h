@@ -26,7 +26,7 @@ ImVec4 *selectedColor;
 bool clicked = false;
 bool disabled = false;
 bool opened=false;
-bool ret;
+bool ret=false;
 std::string filePath;
 
 

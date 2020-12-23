@@ -180,13 +180,17 @@ int main() {
         ImGui::SameLine();
         ImGui::BeginGroup();
         ImGui::PushItemFlag(ImGuiItemFlags_Disabled, true);
-        ImGui::SliderFloat("Red", &color.x, -180.0f, 18.0f, "%.1f");
-        ImGui::SliderFloat("Green ", &color.y, -100.0f, 100.0f, "%.1f");
-        ImGui::SliderFloat("Blue", &color.z, -100.0f, 100.0f, "%.1f");
+        ImGui::SliderFloat("Red", &color.x, 0.0f, 1.0f, "%.1f");
+        ImGui::SliderFloat("Green ", &color.y, 0.0f, 1.0f, "%.1f");
+        ImGui::SliderFloat("Blue", &color.z, 0.0f, 1.0f, "%.1f");
         ImGui::SliderFloat("Alpha", &color.w, 0.0f, 1.0f, "%.1f");
         ImGui::PopItemFlag();
         ImGui::EndGroup();
 
+        if (!ret) {
+            ImGui::Text(
+                    "Please click Menu/Open to load an image file.");
+        }
         ImGui::End();
 
 
