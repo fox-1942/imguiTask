@@ -12,6 +12,7 @@ add_executable(${PROJECT_NAME}
         src/imgui_tables.cpp
         src/imgui_widgets.cpp
         src/imgui_impl_opengl3.cpp
+        src/ImGuiFileBrowser.cpp
         )
 
 target_include_directories(${PROJECT_NAME} PUBLIC
@@ -22,7 +23,6 @@ target_include_directories(${PROJECT_NAME} PUBLIC
         includes/KHR
         )
 
-target_link_directories(${PROJECT_NAME} PUBLIC libs/GLFW)
+target_link_directories(${PROJECT_NAME} PUBLIC libs/GLFW libs/Dirent)
 
-link_libraries("-static")
-target_link_libraries(${PROJECT_NAME} opengl32 glfw3 "-static")
+target_link_libraries(${PROJECT_NAME} opengl32 glfw3 )

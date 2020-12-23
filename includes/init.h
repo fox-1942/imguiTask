@@ -5,7 +5,9 @@
 #ifndef IMGUITASK_INIT_H
 #define IMGUITASK_INIT_H
 
+#include "ImGuiFileBrowser.h"
 
+imgui_addons::ImGuiFileBrowser file_dialog;
 ImVec4 red = ImColor::HSV(0.0f, 1.0f, 1.0f, 1.0f);
 ImVec4 green = ImColor::HSV(0.382f, 1.0f, 1.0f, 1.0f);
 ImVec4 blue = ImColor::HSV(0.520f, 1.0f, 1.0f, 1.0f);
@@ -22,6 +24,10 @@ ImVec4 color = ImVec4(0.5f, 0.5f, 0.5f, 0.0f);
 ImVec4 *selectedColor;
 bool clicked = false;
 bool disabled = false;
+bool opened=false;
+bool ret;
+std::string filePath;
+
 
 
 #endif //IMGUITASK_INIT_H

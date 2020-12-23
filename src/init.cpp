@@ -4,15 +4,15 @@
  * */
 
 #include <gl3w.h>
-#include <iostream>
 #include <glfw3.h>
 #include "imgui.h"
 #include <imgui_internal.h>
-
+#include <iostream>
 #include "imgui_impl_glfw.h"
 #include "imgui_impl_opengl3.h"
 #include "stdio.h"
 #include "init.h"
+
 
 #define STB_IMAGE_IMPLEMENTATION
 
@@ -21,6 +21,38 @@
 static void glfw_error_callback(int error, const char *description) {
     fprintf(stderr, "Glfw Error %d: %s\n", error, description);
 }
+
+
+void showMainMenu()
+{
+    bool open = false, save = false;
+    if(ImGui::BeginMainMenuBar())
+    {
+        if (ImGui::BeginMenu("Menu"))
+        {
+            if (ImGui::MenuItem("Open", NULL))
+                open = true;
+            ImGui::EndMenu();
+        }
+        ImGui::EndMainMenuBar();
+    }
+
+    if(open)
+        ImGui::OpenPopup("Open File");
+
+
+    if(file_dialog.showFileDialog("Open File", imgui_addons::ImGuiFileBrowser::DialogMode::OPEN, ImVec2(700, 310), ".jpg,.png"))
+    {
+      /*  std::cout << file_dialog.selected_fn << std::endl;
+        std::cout << file_dialog.selected_path << std::endl;*/
+
+        filePath=file_dialog.selected_path;
+        std::cout << filePath << std::endl;
+        opened=true;
+    }
+}
+
+
 
 bool LoadTextureFromFile(const char *filename, GLuint *out_texture, int *out_width, int *out_height) {
 
@@ -52,7 +84,7 @@ bool LoadTextureFromFile(const char *filename, GLuint *out_texture, int *out_wid
 ImVec4 readPixelFromImage(ImVec2 mousePosition) {
     int imageWidth(0);
     int imageHeight(0);
-    unsigned char *image_data = stbi_load("../lena.jpg", &imageWidth, &imageHeight, NULL, 4);
+    unsigned char *image_data = stbi_load(filePath.data(), &imageWidth, &imageHeight, NULL, 4);
     unsigned char *pixels = image_data + (int(mousePosition.y) * imageWidth * 4) + (int(mousePosition.x) * 4);
 
     return ImVec4(static_cast<int>(pixels[0]) / 255.0f, static_cast<int>(pixels[1]) / 255.0f,
@@ -73,7 +105,7 @@ int main() {
 
 
     // Window creation
-    GLFWwindow *window = glfwCreateWindow(1280, 1000, "ImGui Task for Grand Color Central - Tamás Boros", NULL, NULL);
+    GLFWwindow *window = glfwCreateWindow(1280, 1000, "ImGui Task for Color Granding Central - Tamás Boros", NULL, NULL);
     if (window == NULL)
         return 1;
     glfwMakeContextCurrent(window);
@@ -95,10 +127,15 @@ int main() {
     ImVec4 clear_color = ImVec4(30.0f / 255.0f, 144.0f / 255.0f, 200.0f / 255.0f, 1.00f);
 
     // Loading images
-    bool ret = LoadTextureFromFile("../lena.jpg", &image, &imageWidth, &imageHeight);
-    IM_ASSERT(ret);
+
 
     while (!glfwWindowShouldClose(window)) {
+        if(opened) {
+            ret = LoadTextureFromFile(filePath.data(), &image, &imageWidth, &imageHeight);
+            IM_ASSERT(ret);
+            opened=false;
+        }
+
         glfwPollEvents();
 
         ImGui_ImplOpenGL3_NewFrame();
@@ -108,61 +145,72 @@ int main() {
         ImGui::NewFrame();
         ImGui::SetNextWindowSize(ImVec2(530, 700), ImGuiCond_Always);
 
+        showMainMenu();
 
         ImGui::Begin("Color Picker for image");
 
-        ImVec2 canvas_p0 = ImGui::GetCursorScreenPos();
 
-        ImGui::Image((void *) (intptr_t) image, ImVec2(imageWidth, imageHeight));
+        if(ret) {
 
-        // Creating invisible canvas before the loaded image
-        ImVec2 canvas_p1 = ImVec2(canvas_p0.x + imageWidth, canvas_p0.y + imageHeight);
+            ImVec2 canvas_p0 = ImGui::GetCursorScreenPos();
 
-        ImGuiIO &io = ImGui::GetIO();
-        ImDrawList *draw_list = ImGui::GetWindowDrawList();
-        draw_list->AddRectFilled(canvas_p0, canvas_p1, IM_COL32(50, 50, 50, 0));
+            ImGui::Image((void *) (intptr_t) image, ImVec2(imageWidth, imageHeight));
 
-        bool is_hovered = ImGui::IsItemHovered();
+            // Creating invisible canvas before the loaded image
+            ImVec2 canvas_p1 = ImVec2(canvas_p0.x + imageWidth, canvas_p0.y + imageHeight);
 
-        draw_list->PushClipRect(canvas_p0, canvas_p1, true);
-        if (is_hovered && ImGui::IsMouseClicked(ImGuiMouseButton_Left)) {
-            mouse_pos_in_canvas = ImVec2(io.MousePos.x - canvas_p0.x, io.MousePos.y - canvas_p0.y);
-            color = readPixelFromImage(mouse_pos_in_canvas);
-            clicked = true;
+            ImGuiIO &io = ImGui::GetIO();
+            ImDrawList *draw_list = ImGui::GetWindowDrawList();
+            draw_list->AddRectFilled(canvas_p0, canvas_p1, IM_COL32(50, 50, 50, 0));
+
+            bool is_hovered = ImGui::IsItemHovered();
+
+            draw_list->PushClipRect(canvas_p0, canvas_p1, true);
+
+
+            if (is_hovered && ImGui::IsMouseClicked(ImGuiMouseButton_Left)) {
+                mouse_pos_in_canvas = ImVec2(io.MousePos.x - canvas_p0.x, io.MousePos.y - canvas_p0.y);
+                color = readPixelFromImage(mouse_pos_in_canvas);
+                clicked = true;
+            }
+
+            if (clicked) {
+                float diff = 30;
+
+                ImVec2 startingPoint_H = ImVec2(canvas_p0.x + mouse_pos_in_canvas.x - diff,
+                                                canvas_p0.y + mouse_pos_in_canvas.y);
+                ImVec2 endingPoint_H = ImVec2(canvas_p0.x + mouse_pos_in_canvas.x + diff,
+                                              canvas_p0.y + mouse_pos_in_canvas.y);
+                draw_list->AddLine(startingPoint_H, endingPoint_H, IM_COL32(0, 100, 0, 100), 5);
+
+                ImVec2 startingPoint_V = ImVec2(canvas_p0.x + mouse_pos_in_canvas.x,
+                                                canvas_p0.y + mouse_pos_in_canvas.y - diff);
+                ImVec2 endingPoint_V = ImVec2(canvas_p0.x + mouse_pos_in_canvas.x,
+                                              canvas_p0.y + mouse_pos_in_canvas.y + diff);
+                draw_list->AddLine(startingPoint_V, endingPoint_V, IM_COL32(0, 100, 0, 100), 5);
+
+            }
+            draw_list->PopClipRect();
+
         }
+            ImGui::Dummy(ImVec2(0.0f, 20.0f));
+            ImGui::Text("Sampled Color:");
 
-        if (clicked) {
-            float diff = 30;
+            ImGui::ColorButton("Sampled color", color, ImGuiColorEditFlags_AlphaPreview, ImVec2(87, 87));
 
-            ImVec2 startingPoint_H = ImVec2(canvas_p0.x + mouse_pos_in_canvas.x - diff,
-                                            canvas_p0.y + mouse_pos_in_canvas.y);
-            ImVec2 endingPoint_H = ImVec2(canvas_p0.x + mouse_pos_in_canvas.x + diff,
-                                          canvas_p0.y + mouse_pos_in_canvas.y);
-            draw_list->AddLine(startingPoint_H, endingPoint_H, IM_COL32(0, 100, 0, 100), 5);
+            ImGui::SameLine();
+            ImGui::BeginGroup();
+            ImGui::PushItemFlag(ImGuiItemFlags_Disabled, true);
+            ImGui::SliderFloat("Red", &color.x, -180.0f, 18.0f, "%.1f");
+            ImGui::SliderFloat("Green ", &color.y, -100.0f, 100.0f, "%.1f");
+            ImGui::SliderFloat("Blue", &color.z, -100.0f, 100.0f, "%.1f");
+            ImGui::SliderFloat("Alpha", &color.w, 0.0f, 1.0f, "%.1f");
+            ImGui::PopItemFlag();
+            ImGui::EndGroup();
 
-            ImVec2 startingPoint_V = ImVec2(canvas_p0.x + mouse_pos_in_canvas.x,
-                                            canvas_p0.y + mouse_pos_in_canvas.y - diff);
-            ImVec2 endingPoint_V = ImVec2(canvas_p0.x + mouse_pos_in_canvas.x,
-                                          canvas_p0.y + mouse_pos_in_canvas.y + diff);
-            draw_list->AddLine(startingPoint_V, endingPoint_V, IM_COL32(0, 100, 0, 100), 5);
-
-        }
-        draw_list->PopClipRect();
-        ImGui::Dummy(ImVec2(0.0f, 20.0f));
-        ImGui::Text("Sampled Color:");
-
-        ImGui::ColorButton("Sampled color", color, ImGuiColorEditFlags_AlphaPreview, ImVec2(87, 87));
-
-        ImGui::SameLine();
-        ImGui::BeginGroup();
-        ImGui::PushItemFlag(ImGuiItemFlags_Disabled, true);
-        ImGui::SliderFloat("Red", &color.x, -180.0f, 18.0f, "%.1f");
-        ImGui::SliderFloat("Green ", &color.y, -100.0f, 100.0f, "%.1f");
-        ImGui::SliderFloat("Blue", &color.z, -100.0f, 100.0f, "%.1f");
-        ImGui::SliderFloat("Alpha", &color.w, 0.0f, 1.0f, "%.1f");
-        ImGui::PopItemFlag();
-        ImGui::EndGroup();
         ImGui::End();
+
+
 
 
         ImGui::SetNextWindowSize(ImVec2(400, 390), ImGuiCond_Always);
@@ -249,7 +297,7 @@ int main() {
 
 
         ImGui::Dummy(ImVec2(0.0, 20.0f));
-        ImGui::Text("HSV sliders issue information:\n https://github.com/ocornut/imgui/issues/2722");
+        ImGui::Text("HSV sliders issue information about ImGUI's HSL/RGB\n problem:\n https://github.com/ocornut/imgui/issues/2722");
 
         ImGui::Dummy(ImVec2(0.0, 20.0f));
         ImGui::Text("Tamás Boros - 2020");
