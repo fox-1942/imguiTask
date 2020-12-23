@@ -25,4 +25,4 @@ target_include_directories(${PROJECT_NAME} PUBLIC
 
 target_link_directories(${PROJECT_NAME} PUBLIC libs/GLFW libs/Dirent)
 
-target_link_libraries(${PROJECT_NAME} opengl32 glfw3 )
+target_link_libraries(${PROJECT_NAME} opengl32 glfw3)

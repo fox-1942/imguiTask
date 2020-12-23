@@ -13,7 +13,6 @@
 #include "stdio.h"
 #include "init.h"
 
-
 #define STB_IMAGE_IMPLEMENTATION
 
 #include "stb_image.h"
@@ -22,14 +21,10 @@ static void glfw_error_callback(int error, const char *description) {
     fprintf(stderr, "Glfw Error %d: %s\n", error, description);
 }
 
-
-void showMainMenu()
-{
+void showMainMenu() {
     bool open = false, save = false;
-    if(ImGui::BeginMainMenuBar())
-    {
-        if (ImGui::BeginMenu("Menu"))
-        {
+    if (ImGui::BeginMainMenuBar()) {
+        if (ImGui::BeginMenu("Menu")) {
             if (ImGui::MenuItem("Open", NULL))
                 open = true;
             ImGui::EndMenu();
@@ -37,56 +32,42 @@ void showMainMenu()
         ImGui::EndMainMenuBar();
     }
 
-    if(open)
+    if (open)
         ImGui::OpenPopup("Open File");
 
 
-    if(file_dialog.showFileDialog("Open File", imgui_addons::ImGuiFileBrowser::DialogMode::OPEN, ImVec2(700, 310), ".jpg,.png"))
-    {
-      /*  std::cout << file_dialog.selected_fn << std::endl;
-        std::cout << file_dialog.selected_path << std::endl;*/
+    if (file_dialog.showFileDialog("Open File", imgui_addons::ImGuiFileBrowser::DialogMode::OPEN, ImVec2(700, 310),
+                                   ".jpg,.png")) {
 
-        filePath=file_dialog.selected_path;
+        filePath = file_dialog.selected_path;
         std::cout << filePath << std::endl;
-        opened=true;
+        opened = true;
     }
 }
 
-
-
-bool LoadTextureFromFile(const char *filename, GLuint *out_texture, int *out_width, int *out_height) {
+bool LoadTextureFromFile(const char *filename) {
 
     // Reading the image into a GL_TEXTURE_2D
-    int image_width = 0;
-    int image_height = 0;
-    unsigned char *image_data = stbi_load(filename, &image_width, &image_height, NULL, 4);
+
+    image_data = stbi_load(filename, &imageWidth, &imageHeight, NULL, 4);
     if (image_data == NULL)
         return false;
 
-    GLuint image_texture;
     glGenTextures(1, &image_texture);
     glBindTexture(GL_TEXTURE_2D, image_texture);
 
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, image_width, image_height, 0, GL_RGBA, GL_UNSIGNED_BYTE, image_data);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, imageWidth, imageHeight, 0, GL_RGBA, GL_UNSIGNED_BYTE, image_data);
 
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    stbi_image_free(image_data);
-    glBindTexture(GL_TEXTURE_2D, 0);
 
-    *out_texture = image_texture;
-    *out_width = image_width;
-    *out_height = image_height;
+    glBindTexture(GL_TEXTURE_2D, 0);
 
     return true;
 }
 
 ImVec4 readPixelFromImage(ImVec2 mousePosition) {
-    int imageWidth(0);
-    int imageHeight(0);
-    unsigned char *image_data = stbi_load(filePath.data(), &imageWidth, &imageHeight, NULL, 4);
     unsigned char *pixels = image_data + (int(mousePosition.y) * imageWidth * 4) + (int(mousePosition.x) * 4);
-
     return ImVec4(static_cast<int>(pixels[0]) / 255.0f, static_cast<int>(pixels[1]) / 255.0f,
                   static_cast<int>(pixels[2]) / 255.0f,
                   static_cast<int>(pixels[3]) / 255.0f);
@@ -105,7 +86,8 @@ int main() {
 
 
     // Window creation
-    GLFWwindow *window = glfwCreateWindow(1280, 1000, "ImGui Task for Color Granding Central - Tamás Boros", NULL, NULL);
+    GLFWwindow *window = glfwCreateWindow(1280, 1000, "ImGui Task for Color Granding Central - Tamás Boros", NULL,
+                                          NULL);
     if (window == NULL)
         return 1;
     glfwMakeContextCurrent(window);
@@ -127,13 +109,11 @@ int main() {
     ImVec4 clear_color = ImVec4(30.0f / 255.0f, 144.0f / 255.0f, 200.0f / 255.0f, 1.00f);
 
     // Loading images
-
-
     while (!glfwWindowShouldClose(window)) {
-        if(opened) {
-            ret = LoadTextureFromFile(filePath.data(), &image, &imageWidth, &imageHeight);
+        if (opened) {
+            ret = LoadTextureFromFile(filePath.data());
             IM_ASSERT(ret);
-            opened=false;
+            opened = false;
         }
 
         glfwPollEvents();
@@ -149,12 +129,11 @@ int main() {
 
         ImGui::Begin("Color Picker for image");
 
-
-        if(ret) {
+        if (ret) {
 
             ImVec2 canvas_p0 = ImGui::GetCursorScreenPos();
 
-            ImGui::Image((void *) (intptr_t) image, ImVec2(imageWidth, imageHeight));
+            ImGui::Image((void *) (intptr_t) image_texture, ImVec2(imageWidth, imageHeight));
 
             // Creating invisible canvas before the loaded image
             ImVec2 canvas_p1 = ImVec2(canvas_p0.x + imageWidth, canvas_p0.y + imageHeight);
@@ -193,24 +172,22 @@ int main() {
             draw_list->PopClipRect();
 
         }
-            ImGui::Dummy(ImVec2(0.0f, 20.0f));
-            ImGui::Text("Sampled Color:");
+        ImGui::Dummy(ImVec2(0.0f, 20.0f));
+        ImGui::Text("Sampled Color:");
 
-            ImGui::ColorButton("Sampled color", color, ImGuiColorEditFlags_AlphaPreview, ImVec2(87, 87));
+        ImGui::ColorButton("Sampled color", color, ImGuiColorEditFlags_AlphaPreview, ImVec2(87, 87));
 
-            ImGui::SameLine();
-            ImGui::BeginGroup();
-            ImGui::PushItemFlag(ImGuiItemFlags_Disabled, true);
-            ImGui::SliderFloat("Red", &color.x, -180.0f, 18.0f, "%.1f");
-            ImGui::SliderFloat("Green ", &color.y, -100.0f, 100.0f, "%.1f");
-            ImGui::SliderFloat("Blue", &color.z, -100.0f, 100.0f, "%.1f");
-            ImGui::SliderFloat("Alpha", &color.w, 0.0f, 1.0f, "%.1f");
-            ImGui::PopItemFlag();
-            ImGui::EndGroup();
+        ImGui::SameLine();
+        ImGui::BeginGroup();
+        ImGui::PushItemFlag(ImGuiItemFlags_Disabled, true);
+        ImGui::SliderFloat("Red", &color.x, -180.0f, 18.0f, "%.1f");
+        ImGui::SliderFloat("Green ", &color.y, -100.0f, 100.0f, "%.1f");
+        ImGui::SliderFloat("Blue", &color.z, -100.0f, 100.0f, "%.1f");
+        ImGui::SliderFloat("Alpha", &color.w, 0.0f, 1.0f, "%.1f");
+        ImGui::PopItemFlag();
+        ImGui::EndGroup();
 
         ImGui::End();
-
-
 
 
         ImGui::SetNextWindowSize(ImVec2(400, 390), ImGuiCond_Always);
@@ -219,8 +196,7 @@ int main() {
         ImGui::Indent(100.0f);
         ImGui::Checkbox("Disable mixer###343", &disabled);
 
-        if (disabled)
-        {
+        if (disabled) {
             ImGui::PushItemFlag(ImGuiItemFlags_Disabled, true);
             ImGui::PushStyleVar(ImGuiStyleVar_Alpha, ImGui::GetStyle().Alpha * 0.5f);
         }
@@ -236,11 +212,11 @@ int main() {
         ImGui::SameLine();
         ImGui::RadioButton(" ###3", &e, 2, ImGui::GetColorU32(blue));
         ImGui::SameLine();
-        ImGui::RadioButton(" ###4", &e, 3,ImGui::GetColorU32(cyan));
+        ImGui::RadioButton(" ###4", &e, 3, ImGui::GetColorU32(cyan));
         ImGui::SameLine();
         ImGui::RadioButton(" ###5", &e, 4, ImGui::GetColorU32(magenta));
         ImGui::SameLine();
-        ImGui::RadioButton(" ###6", &e, 5,ImGui::GetColorU32( yellow));
+        ImGui::RadioButton(" ###6", &e, 5, ImGui::GetColorU32(yellow));
         ImGui::EndGroup();
         ImGui::Dummy(ImVec2(0.0, 10.0f));
 
@@ -252,16 +228,16 @@ int main() {
                 selectedColor = &green;
                 break;
             case 2:
-                selectedColor =& blue;
+                selectedColor = &blue;
                 break;
             case 3:
                 selectedColor = &cyan;
                 break;
             case 4:
-                selectedColor =& magenta;
+                selectedColor = &magenta;
                 break;
             case 5:
-                selectedColor =& yellow;
+                selectedColor = &yellow;
                 break;
         }
 
@@ -274,7 +250,7 @@ int main() {
 
 
         ImGui::Dummy(ImVec2(0.0, 20.0f));
-        if ( ImGui::Button("Reset")) {
+        if (ImGui::Button("Reset")) {
             red = ImColor::HSV(0.0f, 1.0f, 1.0f, 1.0f);
             green = ImColor::HSV(0.382f, 1.0f, 1.0f, 1.0f);
             blue = ImColor::HSV(0.520f, 1.0f, 1.0f, 1.0f);
@@ -284,24 +260,16 @@ int main() {
         }
 
 
-        if (disabled)
-        {
+        if (disabled) {
             ImGui::PopItemFlag();
             ImGui::PopStyleVar();
         }
 
-
-
-
-
-
-
         ImGui::Dummy(ImVec2(0.0, 20.0f));
-        ImGui::Text("HSV sliders issue information about ImGUI's HSL/RGB\n problem:\n https://github.com/ocornut/imgui/issues/2722");
-
+        ImGui::Text(
+                "HSV sliders issue is connected to ImGUI's HSL/RGB\n problem. More info:\n https://github.com/ocornut/imgui/issues/2722");
         ImGui::Dummy(ImVec2(0.0, 20.0f));
         ImGui::Text("Tamás Boros - 2020");
-
 
         ImGui::End();
         ImGui::Render();
