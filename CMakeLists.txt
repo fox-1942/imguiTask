@@ -3,6 +3,8 @@ project(imguiTask)
 
 set(CMAKE_CXX_STANDARD 17)
 
+
+
 add_executable(${PROJECT_NAME}
         src/gl3w.c
         src/init.cpp
@@ -15,14 +17,19 @@ add_executable(${PROJECT_NAME}
         src/ImGuiFileBrowser.cpp
         )
 
+add_subdirectory(external/glfw)
+
+
 target_include_directories(${PROJECT_NAME} PUBLIC
         includes
-        includes/GLFW
         includes/ImGUI
         includes/GL
         includes/KHR
+        external/glfw/include/GLFW
         )
 
-target_link_directories(${PROJECT_NAME} PUBLIC libs/GLFW libs/Dirent)
+target_link_directories(${PROJECT_NAME}
+        PUBLIC libs/Dirent
+        PUBLIC cmake-build-debug/external/glfw/src)
 
 target_link_libraries(${PROJECT_NAME} opengl32 glfw3)

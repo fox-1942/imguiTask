@@ -124,10 +124,9 @@ int main() {
 
 
         ImGui::NewFrame();
-        ImGui::SetNextWindowSize(ImVec2(530, 700), ImGuiCond_Always);
 
         showMainMenu();
-
+        ImGui::SetNextWindowSize(ImVec2(530, 700), ImGuiCond_Always);
         ImGui::Begin("Color Picker for image");
 
         if (ret) {
