@@ -36,11 +36,10 @@ void showMainMenu() {
         ImGui::OpenPopup("Open File");
 
 
-    if (file_dialog.showFileDialog("Open File", imgui_addons::ImGuiFileBrowser::DialogMode::OPEN, ImVec2(700, 310),
-                                   ".jpg,.png")) {
+    if (fileDialog.showFileDialog("Open File", imgui_addons::ImGuiFileBrowser::DialogMode::OPEN, ImVec2(700, 310),
+                                  ".jpg,.png")) {
 
-        filePath = file_dialog.selected_path;
-        std::cout << filePath << std::endl;
+        filePath = fileDialog.selected_path;
         opened = true;
     }
 }
@@ -49,14 +48,14 @@ bool LoadTextureFromFile(const char *filename) {
 
     // Reading the image into a GL_TEXTURE_2D
 
-    image_data = stbi_load(filename, &imageWidth, &imageHeight, NULL, 4);
-    if (image_data == NULL)
+    imageData = stbi_load(filename, &imageWidth, &imageHeight, NULL, 4);
+    if (imageData == NULL)
         return false;
 
-    glGenTextures(1, &image_texture);
-    glBindTexture(GL_TEXTURE_2D, image_texture);
+    glGenTextures(1, &imageTexture);
+    glBindTexture(GL_TEXTURE_2D, imageTexture);
 
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, imageWidth, imageHeight, 0, GL_RGBA, GL_UNSIGNED_BYTE, image_data);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, imageWidth, imageHeight, 0, GL_RGBA, GL_UNSIGNED_BYTE, imageData);
 
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
@@ -67,8 +66,10 @@ bool LoadTextureFromFile(const char *filename) {
 }
 
 ImVec4 readPixelFromImage(ImVec2 mousePosition) {
-    unsigned char *pixels = image_data + (int(mousePosition.y) * imageWidth * 4) + (int(mousePosition.x) * 4);
-    return ImVec4(static_cast<int>(pixels[0]) / 255.0f, static_cast<int>(pixels[1]) / 255.0f,
+    unsigned char *pixels = imageData + (int(mousePosition.y) * imageWidth * 4) + (int(mousePosition.x) * 4);
+
+    return ImVec4(static_cast<int>(pixels[0]) / 255.0f,
+                  static_cast<int>(pixels[1]) / 255.0f,
                   static_cast<int>(pixels[2]) / 255.0f,
                   static_cast<int>(pixels[3]) / 255.0f);
 }
@@ -106,7 +107,7 @@ int main() {
     ImGui::StyleColorsDark();
     ImGui_ImplGlfw_InitForOpenGL(window, true);
     ImGui_ImplOpenGL3_Init("#version 460");
-    ImVec4 clear_color = ImVec4(30.0f / 255.0f, 144.0f / 255.0f, 200.0f / 255.0f, 1.00f);
+    ImVec4 clearColor = ImVec4(30.0f / 255.0f, 144.0f / 255.0f, 200.0f / 255.0f, 1.00f);
 
     // Loading images
     while (!glfwWindowShouldClose(window)) {
@@ -131,45 +132,45 @@ int main() {
 
         if (ret) {
 
-            ImVec2 canvas_p0 = ImGui::GetCursorScreenPos();
+            ImVec2 canvasP0 = ImGui::GetCursorScreenPos();
 
-            ImGui::Image((void *) (intptr_t) image_texture, ImVec2(imageWidth, imageHeight));
+            ImGui::Image((void *) (intptr_t) imageTexture, ImVec2(imageWidth, imageHeight));
 
             // Creating invisible canvas before the loaded image
-            ImVec2 canvas_p1 = ImVec2(canvas_p0.x + imageWidth, canvas_p0.y + imageHeight);
+            ImVec2 canvasP1 = ImVec2(canvasP0.x + imageWidth, canvasP0.y + imageHeight);
 
             ImGuiIO &io = ImGui::GetIO();
-            ImDrawList *draw_list = ImGui::GetWindowDrawList();
-            draw_list->AddRectFilled(canvas_p0, canvas_p1, IM_COL32(50, 50, 50, 0));
+            ImDrawList *drawList = ImGui::GetWindowDrawList();
+            drawList->AddRectFilled(canvasP0, canvasP1, IM_COL32(50, 50, 50, 0));
 
-            bool is_hovered = ImGui::IsItemHovered();
+            bool isHovered = ImGui::IsItemHovered();
 
-            draw_list->PushClipRect(canvas_p0, canvas_p1, true);
+            drawList->PushClipRect(canvasP0, canvasP1, true);
 
 
-            if (is_hovered && ImGui::IsMouseClicked(ImGuiMouseButton_Left)) {
-                mouse_pos_in_canvas = ImVec2(io.MousePos.x - canvas_p0.x, io.MousePos.y - canvas_p0.y);
-                color = readPixelFromImage(mouse_pos_in_canvas);
+            if (isHovered && ImGui::IsMouseClicked(ImGuiMouseButton_Left)) {
+                mousePosInCanvas = ImVec2(io.MousePos.x - canvasP0.x, io.MousePos.y - canvasP0.y);
+                color = readPixelFromImage(mousePosInCanvas);
                 clicked = true;
             }
 
             if (clicked) {
                 float diff = 30;
 
-                ImVec2 startingPoint_H = ImVec2(canvas_p0.x + mouse_pos_in_canvas.x - diff,
-                                                canvas_p0.y + mouse_pos_in_canvas.y);
-                ImVec2 endingPoint_H = ImVec2(canvas_p0.x + mouse_pos_in_canvas.x + diff,
-                                              canvas_p0.y + mouse_pos_in_canvas.y);
-                draw_list->AddLine(startingPoint_H, endingPoint_H, IM_COL32(0, 100, 0, 100), 5);
+                ImVec2 startingPoint_H = ImVec2(canvasP0.x + mousePosInCanvas.x - diff,
+                                                canvasP0.y + mousePosInCanvas.y);
+                ImVec2 endingPoint_H = ImVec2(canvasP0.x + mousePosInCanvas.x + diff,
+                                              canvasP0.y + mousePosInCanvas.y);
+                drawList->AddLine(startingPoint_H, endingPoint_H, IM_COL32(0, 100, 0, 100), 5);
 
-                ImVec2 startingPoint_V = ImVec2(canvas_p0.x + mouse_pos_in_canvas.x,
-                                                canvas_p0.y + mouse_pos_in_canvas.y - diff);
-                ImVec2 endingPoint_V = ImVec2(canvas_p0.x + mouse_pos_in_canvas.x,
-                                              canvas_p0.y + mouse_pos_in_canvas.y + diff);
-                draw_list->AddLine(startingPoint_V, endingPoint_V, IM_COL32(0, 100, 0, 100), 5);
+                ImVec2 startingPoint_V = ImVec2(canvasP0.x + mousePosInCanvas.x,
+                                                canvasP0.y + mousePosInCanvas.y - diff);
+                ImVec2 endingPoint_V = ImVec2(canvasP0.x + mousePosInCanvas.x,
+                                              canvasP0.y + mousePosInCanvas.y + diff);
+                drawList->AddLine(startingPoint_V, endingPoint_V, IM_COL32(0, 100, 0, 100), 5);
 
             }
-            draw_list->PopClipRect();
+            drawList->PopClipRect();
 
         }
         ImGui::Dummy(ImVec2(0.0f, 20.0f));
@@ -278,7 +279,7 @@ int main() {
         ImGui::End();
         ImGui::Render();
 
-        glClearColor(clear_color.x, clear_color.y, clear_color.z, clear_color.w);
+        glClearColor(clearColor.x, clearColor.y, clearColor.z, clearColor.w);
         glClear(GL_COLOR_BUFFER_BIT);
 
         ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
