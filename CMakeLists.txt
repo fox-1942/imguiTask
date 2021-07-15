@@ -18,19 +18,15 @@ add_executable(${PROJECT_NAME}
         src/ImGuiFileBrowser.cpp
         )
 
-add_subdirectory(external/glfw)
-
-
 target_include_directories(${PROJECT_NAME} PUBLIC
         includes
         includes/ImGUI
         includes/GL
         includes/KHR
-        external/glfw/include/GLFW
+        includes/GLFW
         )
 
 target_link_directories(${PROJECT_NAME}
-        PUBLIC libs/Dirent
-        PUBLIC /external/glfw/src)
+        PUBLIC libs)
 
 target_link_libraries(${PROJECT_NAME} opengl32 glfw3 user32 kernel32 gdi32)
